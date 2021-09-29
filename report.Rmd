@@ -1,0 +1,90 @@
+---
+title: "Untitled"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message = FALSE)
+```
+
+## INTRODUCTION
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r summary, echo =FALSE, message=FALSE, warning=FALSE}
+source("ETL.R")
+
+# https://github.com/gadenbuie/xaringan2powerpoint
+
+
+
+```
+
+The data involved `r nrow(data)` unique admissions spread over  x patients
+
+
+## EXPLORATORY DATA ANALYSIS
+
+### Patient biodata
+
+```{r, eda, echo=FALSE, message=FALSE}
+
+source("EDA.R")
+## http://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html
+data<-filter(data, EXPIRE_FLAG == 0)
+
+library(gtsummary)
+library(gt)
+trial2 <- data %>% 
+  mutate(ADMISSION_LOCATION=recode(ADMISSION_LOCATION, 
+                         "HMO REFERRAL/SICK"="External Referral",
+                         "PHYS REFERRAL/NORMAL DELI"="External Referral",
+                         "TRANSFER FROM HOSP/EXTRAM"= "External Referral",
+                         "TRANSFER FROM OTHER HEALT"= "External Referral",
+                         "TRANSFER FROM SKILLED NUR" = "External Referral",
+                         "CLINIC REFERRAL/PREMATURE"= "Ambulatory clinic",
+                         "EMERGENCY ROOM ADMIT" = "Emergency department",
+                         "TRSF WITHIN THIS FACILITY" = "Internal transfer",
+                         "** INFO NOT AVAILABLE **" = "Information not available")) %>% 
+  mutate(Readmission = ifelse(nAdmissions>1, "Readmissions", "Single admission"))%>% select(GENDER,AGE,ADMISSION_TYPE, MARITAL_STATUS,ADMISSION_LOCATION,INSURANCE,Readmission) 
+  
+table1 <- trial2 %>%
+  tbl_summary(
+    by = Readmission,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n}({p}%)"),
+    digits = all_continuous() ~ 2,
+    label = ADMISSION_LOCATION ~ "Admission Location",
+    missing_text = "(Missing)"
+  )%>%
+  modify_caption("**Table 1. Patient Demographics**") %>%
+  bold_labels()%>%
+  as_gt() %>%
+  gt::tab_source_note(gt::md("*This data excludes patients with readmissions*"))
+
+table1
+
+```
+
+
+### Reported diagnosis
+
+```{r}
+# http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html
+
+
+```
+
+
+## FEATURE SELECTION.
+
+
+
+## DATA PREPROCESSING
+
+
+
