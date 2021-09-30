@@ -4,6 +4,14 @@ library(dplyr)
 library(tidyverse)
 data<-read.csv("dataBeforeEDA.csv")
 
+
+
+
+
+
+
+
+
 data <-data[1:200,]
 data<-data %>% 
   mutate(across(everything(), .fns=~replace_na(.,0)))

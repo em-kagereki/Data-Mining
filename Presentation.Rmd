@@ -1,6 +1,6 @@
 ---
-title: "Presentation Ninja"
-subtitle: "⚔<br/>with xaringan"
+title: "MIMIC III ANALYSIS"
+subtitle: ""
 author: "Edwin Kagereki"
 institute: ""
 date: "2021/09/20 (Presented: `r Sys.Date()`)"

@@ -20,21 +20,34 @@ data$DOB <- as.Date(data$DOB)
 data$AGE<-round(as.numeric(difftime(data$ADMITTIME,data$DOB, units = "days")/365),0)
 data$LOS1<-as.numeric(difftime(data$DISCHTIME,data$ADMITTIME, units = "hours"))
 
+
+## Convert into the year
+
 # If the age age was 89 or more, they added 300! We factor that in
+## We then get the admission period
 data<-data %>%
-  mutate(AGE = ifelse(AGE<300, AGE, AGE-211))
+  mutate(AGE = ifelse(AGE<300, AGE, AGE-211)) %>% 
+  mutate(Period = ntile(as.numeric(data$ADMITTIME),12))
+
 
 ## Create a column on the number of admissions 
 ## This must be removed from the model - Data leakage!!
 data<-data %>%
   group_by(SUBJECT_ID) %>%
   arrange(DISCHTIME) %>%
-  mutate(nAdmissions = n_distinct(HADM_ID))
+  mutate(nAdmissions = n_distinct(HADM_ID)) 
+
+
 ## Get the admission cycle
 
 data <- data %>%
   group_by(SUBJECT_ID) %>%
   mutate(admissionCycle = 1:n())
+
+## The EXPIRE_FLAG should only be there when the patient actually dies!!!! Otherwise even if the patient has
+## Multiple admissions and then dies in the last one, ALL the admissions carry the death tag!! This needs to be changed
+
+
 
 # https://stackoverflow.com/questions/30606360/subtract-value-from-previous-row-by-group
 ## This is not correct - To come back!!!!!
@@ -59,5 +72,19 @@ rm(admin)
 rm(pt)
 rm(icustay)
 ## Encoding:
+
+data$admissionCycle<-as.numeric(data$admissionCycle)
+
+
+library(alphaOutlier)
+data$Outlier<- aout.pois(data = data$admissionCycle, param = median(data$admissionCycle), alpha = 0.01)
+
+# https://www.tandfonline.com/doi/abs/10.1080/01621459.1993.10476339
+
+
+#data<- data %>% 
+#  dplyr::filter(admissionCycle <5 ) 
+
+
 
 
