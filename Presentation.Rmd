@@ -1,6 +1,6 @@
 ---
-title: "MIMIC III ANALYSIS"
-subtitle: ""
+title: "Prediction of the ICU bed occupancy"
+subtitle: "MIMIC III ANALYSIS"
 author: "Edwin Kagereki"
 institute: ""
 date: "2021/09/20 (Presented: `r Sys.Date()`)"
@@ -13,15 +13,19 @@ output:
       countIncrementalSlides: false
 ---
 
-background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
+
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
+
+
 ```
 
-???
+```{r, warning=FALSE,message=FALSE, echo=FALSE}
+source("EDA.R")
+trial2
+```
 
-Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sharingan_triple.svg)
 
 ---
 class: center, middle
@@ -113,6 +117,19 @@ class: center, bottom, inverse
 class: inverse, middle, center
 
 # Using xaringan
+---
+
+## Objectives
+
+In this tutorial, you will learn how to:
+
+ - Develop a Stateful LSTM Model with the keras package, which connects to the R TensorFlow backend.
+ - Apply a Keras Stateful LSTM Model to a famous time series, Sunspots.
+ - Perform Time Series Cross Validation using Backtesting with the rsample package rolling forecast origin resampling.
+ - Visualize Backtest Sampling Plans and Prediction Results with ggplot2 and cowplot.
+ - Evaluate whether or not a time series may be a good candidate for an LSTM model by reviewing the Autocorrelation Function (ACF) plot.
+ - The end result is a high performance deep learning algorithm that does an excellent job at predicting ten years of sunspots! Here’s the plot of the Backtested Keras Stateful LSTM Model.
+
 
 ---
 
@@ -135,7 +152,7 @@ See the help page `?xaringan::moon_reader` for all possible options that you can
 
 ---
 
-# remark.js vs xaringan
+# Objectives
 
 Some differences between using remark.js (left) and using **xaringan** (right):
 

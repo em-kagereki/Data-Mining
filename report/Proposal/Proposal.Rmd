@@ -1,0 +1,79 @@
+---
+title: |
+  Predicting mortality in patients with suspected acute cardiac syndrome using patient demographics and the golden hour interventions. 
+type: Project proposal (HINF6210-DataMining)
+author:
+  - name: Edwin Kagereki
+    affil: 
+    email: kagereki@dal.ca
+
+affiliation:
+  - num: 
+    address: |
+     
+
+bibliography: interactcadsample.bib
+appendix: 
+abstract: 
+keywords: 
+header-includes: |
+  \usepackage{hyperref}
+  \usepackage[utf8]{inputenc}
+  \def\tightlist{}
+output: rticles::tf_article
+---
+
+# Introduction
+
+Cardiovascular diseases (CVDs), principally ischemic heart disease (IHD) and stroke, are the leading cause of global mortality. In addition to their increasing global prevalence, they are often associated with poor survival. [@roth]
+
+The concept of the golden hour refers to the vital period by which a patient with a suspected cardiovascular event should be receiving definitive treatment to prevent death or irreparable damage to the heart.Although not set in stone, the chances to save a patient are usually  high if substantive medical attention is given within an hour of the cardiac event[@Okada]. 
+
+This project aims at predicting the mortality of patients admitted in ICU with suspected cardiovascular events using data from patients who stayed in critical care units.
+
+# Dataset description
+
+The MIMIC-III dataset (version 1.4)[@johnson] is provided by the MIT Laboratory of Computational Physiology (LCP) and comprises of health-related data of patients who stayed in critical care units of the Beth Israel Deaconess Medical Center, Boston, Massachusetts, between 2001 and 2012. Access to the data was accessed after: 
+
+* Completion of a course in protecting human research participants, including Health Insurance Portability and Accountability Act (HIPAA) requirements.
+* Signing a data use agreement, which outlines appropriate data usage and security standards, and forbidding efforts to identify individual patients.
+
+The data is provided as a collection of comma separated value (CSV) files, along with scripts to help with importing the data into a relational database. This data was de-identified in accordance with Health Insurance Portability and Accountability Act (HIPAA) standards using structured data cleansing and date shifting.[@JGoldberger]
+
+
+
+## summary of data
+
+```{r, warning=FALSE,message=FALSE, echo=FALSE}
+
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+source("EDA.R")
+```
+
+
+
+
+```{r, warning=FALSE,message=FALSE, echo=FALSE}
+
+table1
+
+```
+
+
+# Research question
+
+
+
+
+# Proposed analysis
+
+
+
+
+
+
+
+
+
+
+

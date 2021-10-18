@@ -1,0 +1,136 @@
+% interactcadsample.tex
+% v1.03 - April 2017
+
+\documentclass[]{interact}
+
+\usepackage{epstopdf}% To incorporate .eps illustrations using PDFLaTeX, etc.
+\usepackage{subfigure}% Support for small, `sub' figures and tables
+%\usepackage[nolists,tablesfirst]{endfloat}% To `separate' figures and tables from text if required
+
+\usepackage{natbib}% Citation support using natbib.sty
+\bibpunct[, ]{(}{)}{;}{a}{}{,}% Citation support using natbib.sty
+\renewcommand\bibfont{\fontsize{10}{12}\selectfont}% Bibliography support using natbib.sty
+
+\theoremstyle{plain}% Theorem-like structures provided by amsthm.sty
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{notation}{Notation}
+
+% see https://stackoverflow.com/a/47122900
+
+% Pandoc citation processing
+
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\def\tightlist{}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+
+\begin{document}
+
+\articletype{Project proposal (HINF6210-DataMining)}
+
+\title{Predicting mortality in patients with suspected acute cardiac
+syndrome using patient demographics and the golden hour interventions.}
+
+
+\author{\name{Edwin Kagereki$^{}$}
+\affil{$^{}$}
+}
+
+\thanks{CONTACT Edwin
+Kagereki. Email: \href{mailto:kagereki@dal.ca}{\nolinkurl{kagereki@dal.ca}}}
+
+\maketitle
+
+
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Cardiovascular diseases (CVDs), principally ischemic heart disease (IHD)
+and stroke, are the leading cause of global mortality. In addition to
+their increasing global prevalence, they are often associated with poor
+survival. \citep{roth}
+
+The concept of the golden hour refers to the vital period by which a
+patient with a suspected cardiovascular event should be receiving
+definitive treatment to prevent death or irreparable damage to the
+heart.Although not set in stone, the chances to save a patient are
+usually high if substantive medical attention is given within an hour of
+the cardiac event\citep{Okada}.
+
+This project aims at predicting the mortality of patients admitted in
+ICU with suspected cardiovascular events using data from patients who
+stayed in critical care units.
+
+\hypertarget{dataset-description}{%
+\section{Dataset description}\label{dataset-description}}
+
+The MIMIC-III dataset (version 1.4)\citep{johnson} is provided by the
+MIT Laboratory of Computational Physiology (LCP) and comprises of
+health-related data of patients who stayed in critical care units of the
+Beth Israel Deaconess Medical Center, Boston, Massachusetts, between
+2001 and 2012. Access to the data was accessed after:
+
+\begin{itemize}
+\tightlist
+\item
+  Completion of a course in protecting human research participants,
+  including Health Insurance Portability and Accountability Act (HIPAA)
+  requirements.
+\item
+  Signing a data use agreement, which outlines appropriate data usage
+  and security standards, and forbidding efforts to identify individual
+  patients.
+\end{itemize}
+
+The data is provided as a collection of comma separated value (CSV)
+files, along with scripts to help with importing the data into a
+relational database. This data was de-identified in accordance with
+Health Insurance Portability and Accountability Act (HIPAA) standards
+using structured data cleansing and date shifting.\citep{JGoldberger}
+
+\hypertarget{summary-of-data}{%
+\subsection{summary of data}\label{summary-of-data}}
+
+\begin{verbatim}
+## function (x, ...) 
+## {
+##     UseMethod("table1")
+## }
+## <bytecode: 0x000000002dd3b3b0>
+## <environment: namespace:table1>
+\end{verbatim}
+
+\hypertarget{research-question}{%
+\section{Research question}\label{research-question}}
+
+\bibliographystyle{tfcad}
+\bibliography{interactcadsample.bib}
+
+
+
+
+\end{document}

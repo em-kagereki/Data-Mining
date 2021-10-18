@@ -1,8 +1,51 @@
-setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4")
-library(factoextra)
-library(dplyr)
-library(tidyverse)
-data<-read.csv("dataBeforeEDA.csv")
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+
+#data<-read.csv("dataBeforeEDA.csv")
+
+
+source("EDA.R")
+
+
+
+### THis code is meant  to augment the data with 0's
+
+dat4 <-df <- data.frame(matrix(ncol = ncol(data3), nrow = 0))
+x<-colnames(data3)
+df <- data.frame(matrix(ncol = ncol(data3), nrow = 1))
+colnames(df) <- x
+df[is.na(df)] <- 0
+
+
+
+dfList <- split( data3 , f = data3$SUBJECT_ID )
+
+for(i in 1:length(dfList))
+{
+  miniData <-dfList[[i]]
+  if (nrow(miniData)<4){
+    diff<-4-nrow(miniData)
+    temp<-data.frame(matrix(ncol = ncol(miniData), nrow = diff))
+    temp[is.na(temp)] <- 0
+    colnames(temp) <- x
+    temp$HADM_ID<-miniData[1,1]
+    miniData1<-rbind(temp,miniData)  
+    df <-rbind(df,miniData1)
+  }else{
+    df <-rbind(df,miniData)
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

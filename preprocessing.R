@@ -121,21 +121,25 @@ memory.size(max=F)
 
 ### THis code is meant  to augment the data with 0's
 data2 <-df <- data.frame(matrix(ncol = ncol(data), nrow = 0))
-x<-colnames(data)
+x<-colnames(data3)
 df <- data.frame(matrix(ncol = ncol(data), nrow = 42))
 colnames(df) <- x
 df[is.na(df)] <- 0
 
 data2 <-df <- data.frame(matrix(ncol = ncol(data), nrow = 1))
-colnames(data2) <- x
 data2[is.na(data2)] <- 0
-dfList <- split( data , f = data$SUBJECT_ID )
+colnames(data2) <- x
+
+
+dfList <- split( data3 , f = data$SUBJECT_ID )
 for(i in 1:length(dfList))
 {
-  miniData <-dfList[[i]]
-  if (nrow(miniData)<42){
-    df$HADM_ID<-miniData$HADM_ID  
-    df2 <-df[1:(42-nrow(miniData)),]
+  miniData <-data.frame(dfList[i])
+  colnames(miniData) <- x
+  
+  if (nrow(miniData)<4){
+    df$SUBJECT_ID<-miniData$SUBJECT_ID  
+    df2 <-df[1:(4-nrow(miniData)),]
     miniData1<-cbind(df2,miniData)  
     data2 <-cbind(data2,miniData)
   }else{
