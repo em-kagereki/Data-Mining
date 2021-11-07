@@ -199,7 +199,6 @@ cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"off 
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"off pump coronary artery bypass", "cabg")
 #cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"", "cabg")
 
-
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"inferior myocardial infarction", "mi")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"non q wave myocardial infaction", "mi")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"non/q wave myocardial infarction", "mi")
@@ -212,7 +211,6 @@ cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"miio
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"anterior wall mi", "mi")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"anterior mi", "mi")
 
-
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"3 vessel cad", "3VD")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"3 vessel coronary artery disease", "3VD")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"3/vessel coronary artery disease", "3VD")
@@ -222,7 +220,6 @@ cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"seve
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"three vessel coronary artery disease", "3VD")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"3 vessel disease", "3VD")
 
-
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"new a/fib", "afib")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"a/fib", "afib")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"atrial fibrillation", "afib")
@@ -230,8 +227,34 @@ cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"atri
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"atrial fib", "afib")
 
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"s/p", "post")
-table<-table(cardiacSyndromes$DIAGNOSIS3)
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"abd pain", "abdominal pain")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"abd aortic", "abdominal aortic")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"thoraua", "thoracic")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"aortic valve replacement redo|redo aortic valve replacement", "avr")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"mitral valve replacement redo", "mvr")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"mitral valve replacement", "mvr")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"aortic valve replacement", "avr")
 
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"thoraco/abdominal", "thoracoabdominal")
+
+ 
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"myocardial infarction", "mi")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"acute mi", "mi")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"re/do", "redo")
+
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"gastrointestinal bleed", "gi bleed")
+
+
+
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"90/", "")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"afibrialltion", "afib")
+cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"afibuation", "afib")
+
+
+
+
+
+table<-table(cardiacSyndromes$DIAGNOSIS3)
 
 cardiacSyndromes2<-cardiacSyndromes %>% select(SUBJECT_ID,HADM_ID,endGoldenHour)
 Loinc <- read.csv("Loinc.csv") %>% 
@@ -239,7 +262,6 @@ Loinc <- read.csv("Loinc.csv") %>%
   select(LOINC_CODE,RELATEDNAMES2)
 
 ## Source("PrepareLabData.R") ## The lab data is 1.72GB, manipulations were limited, therefore it was run in the server 
-
 labNew<-read.csv("newdata.csv") 
 labNew<- merge(x=labNew, y = Loinc, by = "LOINC_CODE", x.all=TRUE) %>% 
   mutate_if(is.character, list(~na_if(.,""))) %>% 
@@ -249,7 +271,7 @@ labNew<- merge(x=labNew, y = Loinc, by = "LOINC_CODE", x.all=TRUE) %>%
 ## The labs in those missing the HADM were done as outpatients
 missingHADM<-labNew %>% 
   filter(is.na(HADM_ID)) 
-## We check teh admission of the patient!
+## We check the admission of the patient!
 missingHADM2<- merge(x=missingHADM,y=admin,by="SUBJECT_ID", x.all=TRUE) %>% 
   select(SUBJECT_ID,HADM_ID.x,HADM_ID.y,CHARTTIME,ADMITTIME,DISCHTIME,combined,LOINC_CODE) %>% 
   mutate(Checktime = ifelse(CHARTTIME>=ADMITTIME & CHARTTIME<=DISCHTIME, "After", "Before")) %>% 
@@ -274,6 +296,31 @@ labWide<-merge(x=cardiacSyndromes2,y=allLAbs,by='HADM_ID',x.all=TRUE) %>%
   replace(is.na(.), 0)
 
 services<-read.csv("SERVICES.csv")
+serviceMerge<-services %>% 
+  unite(group,PREV_SERVICE, CURR_SERVICE, sep = "_", remove = FALSE) 
+serviceN<-data.frame(prop.table(table(serviceMerge$group)))
+names(serviceN)[names(serviceN) == "Var1"] <- "group"
+serviceMerge<-merge(x=serviceMerge,y=serviceN, by = 'group', all.x = TRUE)
+services2<-merge(x=cardiacSyndromes2,y=serviceMerge,by='HADM_ID',x.all=TRUE) %>% 
+  select(HADM_ID,Freq)
+
+group <- services2 %>%
+  group_by(HADM_ID) %>%
+  summarise(all_names = paste(Freq, collapse = "/"))
+group$count <- sapply(strsplit(group$all_names,'/'), uniqueN)
+serviceGroup<-data.frame(str_split_fixed(group$all_names, "/", 7))%>% 
+  replace(is.na(.), 0)
+serviceGroup$X1 <- ifelse(nchar(serviceGroup$X1)==0, 0, serviceGroup$X1)
+serviceGroup$X2 <- ifelse(nchar(serviceGroup$X2)==0, 0, serviceGroup$X2)
+serviceGroup$X3 <- ifelse(nchar(serviceGroup$X3)==0, 0, serviceGroup$X3)
+serviceGroup$X4 <- ifelse(nchar(serviceGroup$X4)==0, 0, serviceGroup$X4)
+serviceGroup$X5 <- ifelse(nchar(serviceGroup$X5)==0, 0, serviceGroup$X5)
+serviceGroup$X6 <- ifelse(nchar(serviceGroup$X6)==0, 0, serviceGroup$X6)
+serviceGroup$X7 <- ifelse(nchar(serviceGroup$X7)==0, 0, serviceGroup$X7)
+serviceGroup<-cbind(group$HADM_ID,serviceGroup)
+names(serviceGroup)[1] <- "HADM_ID"
+
+
 services2<-merge(x=cardiacSyndromes2,y=services,by='HADM_ID',x.all=TRUE) %>% 
   mutate(TRANSFERTIME2 = ymd_hms(TRANSFERTIME)) %>% 
   mutate(Checktime = ifelse(endGoldenHour>=TRANSFERTIME2, "After", "Before")) %>% 
@@ -284,12 +331,13 @@ services2<-merge(x=cardiacSyndromes2,y=services,by='HADM_ID',x.all=TRUE) %>%
 services3<-services2 %>% count(HADM_ID, cService, sort = TRUE)
 servicesWide <- services3 %>% 
   spread(cService, n) %>% 
-  replace(is.na(.), 0)
-
+  replace(is.na(.), 0) 
 servicesWide<-merge(x=cardiacSyndromes2, y=servicesWide, by="HADM_ID", all.x = TRUE) %>% 
-  replace(is.na(.), 0)
+  replace(is.na(.), 0)%>% 
+  select(-SUBJECT_ID,-endGoldenHour)
 checkServicesBeforeAdmin<-servicesWide %>% filter(HADM_ID==0) 
 nrow(checkServicesBeforeAdmin)
+
 
 ## Procedures
 procedures<-read.csv("PROCEDUREEVENTS_MV.csv")
@@ -303,35 +351,97 @@ group<-aggregate(procedures$LABEL, list(procedures$HADM_ID), paste, collapse="/"
 names(group)[1] <- "HADM_ID"
 procW<-merge(x=group,y=cardiacSyndromes2, by = "HADM_ID",x.all=TRUE)
 
+procW$count <- sapply(strsplit(procW$x,'/'), uniqueN)
+proc<-data.frame(str_split_fixed(procW$x, "/", max(procW$count)))
+
+
+
+
 logProdecures<-procedures
 procWide<-merge(x=procedures,y=cardiacSyndromes2, by = "HADM_ID",x.all=TRUE) %>% 
   mutate(STARTTIME2 = ymd_hms(STARTTIME)) %>% 
   mutate(Checktime = ifelse(endGoldenHour>=STARTTIME2, "After", "Before")) %>% 
   filter(Checktime=="Before") %>% 
   select(HADM_ID,LABEL) %>% count(HADM_ID, LABEL, sort = TRUE)%>% 
-  spread(LABEL, n) %>% 
+  spread(LABEL, n) %>%
   replace(is.na(.), 0)
 procWide<-merge(x=cardiacSyndromes2, y=procWide, by="HADM_ID", all.x = TRUE) %>% 
   replace(is.na(.), 0)
-
 microb<-read.csv("MICROBIOLOGYEVENTS.csv") %>% 
   select(-ROW_ID,-SUBJECT_ID)
 microb<-merge(x=cardiacSyndromes2,y=microb,by='HADM_ID',x.all=TRUE) %>% 
   mutate(CHARTTIME = ymd_hms(CHARTTIME)) %>% 
-  unite(combined, SPEC_TYPE_DESC, ORG_NAME,AB_NAME,INTERPRETATION, sep = "_", remove = FALSE)
-#Logmicrob<-microb
-#write.csv(Logmicrob,"Logmicrob")
-microbWide<-microb%>% 
-  mutate(Checktime = ifelse(endGoldenHour>=CHARTTIME, "After", "Before")) %>% 
-  filter(Checktime=="Before") %>% 
-  select(HADM_ID,combined) %>% 
-  count(HADM_ID, combined, sort = TRUE) %>% 
-  spread(combined, n) %>% 
+  unite(combined, SPEC_TYPE_DESC, ORG_NAME,AB_NAME,INTERPRETATION, sep = "_", remove = FALSE) %>% 
+  select(HADM_ID,combined)
+microbN<-data.frame(prop.table(table(microb$combined)))
+names(microbN)[names(microbN) == "Var1"] <- "group"
+names(microb)[names(microb) == "combined"] <- "group"
+microb<-merge(x=microb,y=microbN, by = 'group', all.x = TRUE)
+microb<-merge(x=cardiacSyndromes2,y=microb,by='HADM_ID',x.all=TRUE) %>% 
+  select(HADM_ID,Freq)
+miGroup <- microb %>%
+  group_by(HADM_ID) %>%
+  summarise(all_names = paste(Freq, collapse = "/"))
+miGroup$count <- sapply(strsplit(miGroup$all_names,'/'), uniqueN)
+microbGroup<-data.frame(str_split_fixed(miGroup$all_names, "/", 75))%>% 
+  replace(is.na(.), 0)
+microGroup<-cbind(miGroup$HADM_ID,microbGroup)
+names(microGroup)[1] <- "HADM_ID"
+#m<-microGroup %>% 
+#  mutate_all(microGroup, list(~na_if(.,"")))
+for(i in 1:ncol(microGroup)) {    
+  microGroup[ , i][microGroup[ , i]==""]<-0
+  # for-loop over columns
+}
+microGroup<-microGroup %>% 
   replace(is.na(.), 0)
 
-
 ## Medication
-meds<-read.csv("PRESCRIPTIONS.csv") %>% 
+meds<-read.csv("PRESCRIPTIONS.csv")
+meds<-merge(x=cardiacSyndromes2,y=meds,by='HADM_ID',x.all=TRUE) %>% 
+      mutate(drug2 = tolower(DRUG)) %>% 
+      select(HADM_ID,DRUG,drug2) 
+meds$drug2 <- str_replace(meds$drug2,"aspirin","Aspirin")  
+meds$drug2 <- str_replace(meds$drug2,"morphine","Morphine")  
+meds$drug2 <- str_replace(meds$drug2,(paste(HMGCoA, collapse="|")),"HMGCoA")  
+meds$drug2 <- str_replace(meds$drug2,(paste(ACE, collapse="|")),"ACE Inhibitors")  
+meds$drug2 <- str_replace(meds$drug2,(paste(betaBlockers, collapse="|")),"Beta blockers")  
+meds$drug2 <- str_replace(meds$drug2,(paste(glycoproteinInhibitors, collapse="|")),"GpIIb/IIIa inhibitors")  
+meds$drug2 <- str_replace(meds$drug2,"nitroglycerin","Nitroglycerine")  
+med2<-meds[!duplicated(meds$drug2),] %>% 
+  select(drug2)
+med.hash<-hashed.model.matrix(c("drug2"),med2,hash.size=2^20,
+                              create.mapping = TRUE)
+Medmapping<-hash.mapping(med.hash)
+datMed<-as.data.frame(hashed.value(Medmapping))
+mean(duplicated(Medmapping))
+names<-data.frame(names(Medmapping))
+medMap<-cbind(datMed,names)
+names(medMap)[1]<-"value"
+names(medMap)[2]<-"drug2"
+medMap$drug2 <- gsub("drug2","",medMap$drug2)  
+medMap$drug2<-trimws(medMap$drug2)
+med2<-merge(x=meds, y = medMap, by ="drug2", all.x = TRUE ) %>% 
+  select(-drug2,-DRUG)
+
+medGroup <- med2 %>%
+  group_by(HADM_ID) %>%
+  summarise(all_names = paste(value, collapse = "/"))
+medGroup$count <- sapply(strsplit(medGroup$all_names,'/'), uniqueN)
+mediGroup<-data.frame(str_split_fixed(medGroup$all_names, "/", 144))%>% 
+  replace(is.na(.), 0)
+mediGroup<-cbind(medGroup$HADM_ID,mediGroup)
+names(mediGroup)[1] <- "HADM_ID"
+
+for(i in 1:ncol(mediGroup)) {    
+  mediGroup[ , i][mediGroup[ , i]==""]<-0
+  # for-loop over columns
+}
+
+
+
+
+meds<-meds %>% 
   mutate(drug2 = tolower(DRUG)) %>% 
   filter( grepl(paste(subset, collapse="|"),drug2)) %>% 
   mutate(DRUG = case_when(grepl("aspirin", drug2) ~ "Aspirin",
@@ -357,16 +467,16 @@ meds<-read.csv("PRESCRIPTIONS.csv") %>%
 
 ## Write flat files:
 # Classification:
-write.csv(cardiacSyndromes,"cardiacSyndromes.csv")
-write.csv(servicesWide,"servicesWide.csv")
-write.csv(labWide,"labWide.csv")
-write.csv(procWide,"procWide.csv")
-write.csv(microbWide,"microbWide.csv")
+#write.csv(cardiacSyndromes,"cardiacSyndromes.csv")
+#write.csv(servicesWide,"servicesWide.csv")
+#write.csv(labWide,"labWide.csv")
+#write.csv(procWide,"procWide.csv")
+#write.csv(microbWide,"microbWide.csv")
 
 # Process mining:
-write.csv(logProdecures,"logProdecures.csv")
-write.csv(microbWide,"microbWide.csv")
-write.csv(medication, "medication.csv")
+#write.csv(logProdecures,"logProdecures.csv")
+#write.csv(microbWide,"microbWide.csv")
+#write.csv(medication, "medication.csv")
 
 
 
