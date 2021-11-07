@@ -17,11 +17,19 @@ microbWide<-read.csv("microbWide.csv") %>%
 #View(microbWide)
 
 
+## https://towardsdatascience.com/machine-learning-with-datetime-feature-engineering-predicting-healthcare-appointment-no-shows-5e4ca3a85f96
 
 cardiacSyndromesModel<- cardiacSyndromes %>% 
-  select(-X,-ADMITTIME,-DISCHTIME,-DISCHARGE_LOCATION,-HOSPITAL_EXPIRE_FLAG,-HAS_CHARTEVENTS_DATA,
+  select(-X,-Period,-DISCHTIME,-DISCHARGE_LOCATION,-HOSPITAL_EXPIRE_FLAG,-HAS_CHARTEVENTS_DATA,
          -EDOUTTIME,-EDREGTIME,-DEATHTIME,-DOB,-LOS2,-endGoldenHour,-nAdmissions,-deadBefore,-SUBJECT_ID) %>% 
-  mutate_all(list(~na_if(.,"")))
+  mutate_all(list(~na_if(.,""))) %>% 
+  mutate(dayOfYear = yday(ADMITTIME)) %>% 
+  mutate(Month = month(ADMITTIME)) %>% 
+  mutate(week = week(ADMITTIME)) %>% 
+  mutate(weekday = wday(ADMITTIME)) %>% 
+  mutate(year = year(ADMITTIME)) %>% 
+  mutate(hour = hour(ADMITTIME))
+
 
 
 ## Missingness of the data
@@ -52,6 +60,8 @@ cardiacSyndromesModel<-cardiacSyndromesModel %>%
   select(-DIAGNOSIS)
 
 #write.csv(cardiacSyndromesModel,"cardiacSyndromesModel.csv")
+
+## Data is balanced
 
 cardiacSyndromesModel %>% group_by(EXPIRE_FLAG) %>% summarize(count=n())
 

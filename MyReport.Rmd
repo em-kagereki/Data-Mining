@@ -692,4 +692,25 @@ Summarize important experience gained during the project. For example, pitfalls,
 * Document the specific data mining process (How can the results and the experience of applying the model be fed back into the process?)
 * Generalize from the details to make the experience useful for future projects
 
+
+# Appendix
+
+```{r, echo= TRUE, eval=FALSE}
+
+con <- DBI::dbConnect(RPostgreSQL::PostgreSQL(), 
+  host = "AWS end point",
+  user = "eKagereki",
+  password = rstudioapi::askForPassword("Database password")
+)
+
+data <- tbl(con, "ADMISSIONS")
+
+
+```
+
+
+
+
 # References
+
+

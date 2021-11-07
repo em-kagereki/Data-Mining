@@ -1,5 +1,6 @@
 ---
-title: "Prediction of the ICU bed occupancy"
+title: "Explainable artificial intelligence model to predict mortality in patients
+   with suspected acute coronary syndrome"
 subtitle: "MIMIC III ANALYSIS"
 author: "Edwin Kagereki"
 institute: ""
@@ -13,31 +14,23 @@ output:
       countIncrementalSlides: false
 ---
 
-
-
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 
 
 ```
 
-```{r, warning=FALSE,message=FALSE, echo=FALSE}
-source("EDA.R")
-trial2
-```
-
-
----
-class: center, middle
-
-# xaringan
-
-### /ʃaː.'riŋ.ɡan/
-
 ---
 class: inverse, center, middle
 
-# Get Started
+# Outline
+
+ Business Understanding
+ Data Understanding
+ Business Understanding
+ Business Understanding
+ Data Understanding
+ Business Understanding
 
 ---
 
