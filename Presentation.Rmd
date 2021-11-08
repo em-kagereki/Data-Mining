@@ -20,136 +20,143 @@ options(htmltools.dir.version = FALSE)
 
 ```
 
----
+
 class: inverse, center, middle
 
 # Outline
 
- Business Understanding
- Data Understanding
- Business Understanding
- Business Understanding
- Data Understanding
- Business Understanding
+ - Business Understanding
+ - Data Understanding
+ - Data Preparation
+ - Modeling
+ - Evaluation
+ - Deployment
 
 ---
+# Business Understanding
 
-# Hello World
+- Cardiovascular diseases (CVDs) are the leading cause of global mortality.
+- Prediction of prognosis model for patients with suspected ACS is important in critical care medicine.
 
-Install the **xaringan** package from [Github](https://github.com/yihui/xaringan):
-
-```{r eval=FALSE, tidy=FALSE}
-remotes::install_github("yihui/xaringan")
-```
-
---
-
-You are recommended to use the [RStudio IDE](https://www.rstudio.com/products/rstudio/), but you do not have to.
-
-- Create a new R Markdown document from the menu `File -> New File -> R Markdown -> From Template -> Ninja Presentation`;<sup>1</sup>
-
---
-
-- Click the `Knit` button to compile it;
-
---
-
-- or use the [RStudio Addin](https://rstudio.github.io/rstudioaddins/)<sup>2</sup> "Infinite Moon Reader" to live preview the slides (every time you update and save the Rmd document, the slides will be automatically reloaded in RStudio Viewer.
-
-.footnote[
-[1] 中文用户请看[这份教程](https://slides.yihui.org/xaringan/zh-CN.html)
-
-[2] See [#2](https://github.com/yihui/xaringan/issues/2) if you do not see the template or addin in RStudio.
-]
 
 ---
-background-image: url(`r xaringan:::karl`)
-background-position: 50% 50%
-class: center, bottom, inverse
+# Data Understanding
 
-# You only live once!
+- MIMIC-III is a large, freely-available database comprising deidentified healthrelated data associated with 46,520 patients who stayed in critical care units of the Beth Israel Deaconess
+Medical Center between 2001 and 2012.
 
----
+- Researchers seeking to use the database must:
+1. Become a credentialed user on PhysioNet. This involves completion of a training course in human
+subjects research.
+2. Sign the data use agreement. Adherence to the terms of the DUA is paramount.
 
-# Hello Ninja
+- All data was collected downloaded  to  PostgreSQL database, and SQL queries were thereafter applied. 
+- Although the database includes 26 tables, only the ADMISSIONS,PATIENTS,SERVICES,DIAGNOSIS_ICD,MICROBIOLOGYEVENTS,
+PRESCRIPTIONS,PROCEDUREEVENTS_MV,D_ITEMS,D_LABITEMS`*`
 
-As a presentation ninja, you certainly should not be satisfied by the "Hello World" example. You need to understand more about two things:
+.footnote[[*] This was enriched with the [Loinc tables](https://loinc.org/downloads/)]
 
-1. The [remark.js](https://remarkjs.com) library;
-
-1. The **xaringan** package;
-
-Basically **xaringan** injected the chakra of R Markdown (minus Pandoc) into **remark.js**. The slides are rendered by remark.js in the web browser, and the Markdown source needed by remark.js is generated from R Markdown (**knitr**).
-
----
-
-# remark.js
-
-You can see an introduction of remark.js from [its homepage](https://remarkjs.com). You should read the [remark.js Wiki](https://github.com/gnab/remark/wiki) at least once to know how to
-
-- create a new slide (Markdown syntax<sup>*</sup> and slide properties);
-
-- format a slide (e.g. text alignment);
-
-- configure the slideshow;
-
-- and use the presentation (keyboard shortcuts).
-
-It is important to be familiar with remark.js before you can understand the options in **xaringan**.
-
-.footnote[[*] It is different with Pandoc's Markdown! It is limited but should be enough for presentation purposes. Come on... You do not need a slide for the Table of Contents! Well, the Markdown support in remark.js [may be improved](https://github.com/gnab/remark/issues/142) in the future.]
-
----
-background-image: url(`r xaringan:::karl`)
-background-size: cover
-class: center, bottom, inverse
-
-# I was so happy to have discovered remark.js!
-
----
-class: inverse, middle, center
-
-# Using xaringan
 ---
 
 ## Objectives
 
-In this tutorial, you will learn how to:
+The aim of the project was:
 
- - Develop a Stateful LSTM Model with the keras package, which connects to the R TensorFlow backend.
- - Apply a Keras Stateful LSTM Model to a famous time series, Sunspots.
- - Perform Time Series Cross Validation using Backtesting with the rsample package rolling forecast origin resampling.
- - Visualize Backtest Sampling Plans and Prediction Results with ggplot2 and cowplot.
- - Evaluate whether or not a time series may be a good candidate for an LSTM model by reviewing the Autocorrelation Function (ACF) plot.
- - The end result is a high performance deep learning algorithm that does an excellent job at predicting ten years of sunspots! Here’s the plot of the Backtested Keras Stateful LSTM Model.
+- This project aims at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause
+mortality after one hour of treatment(golden hour) using machine learning classification algorithm.
+- Explanation of the predicted outcome based on the care pathway using process mining. This AHA guideline(ACLS 2020) will was used as the gold standard for ACS workflow`*`.
 
+.footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
 
 ---
+# Data preparation
 
-# xaringan
-
-Provides an R Markdown output format `xaringan::moon_reader` as a wrapper for remark.js, and you can use it in the YAML metadata, e.g.
-
-```yaml
+- Data exploration.
+- Derived attributes.
+- Encoding of categorical variables.
+- Data standardization.
+- EVent log generation.
 ---
-title: "A Cool Presentation"
-output:
-  xaringan::moon_reader:
-    yolo: true
-    nature:
-      autoplay: 30000
----
+# Data access
+
+- After connecting to the PostgreSQL database,  SQL queries were made using the R dplyr interface.
+
+```{r, eval=FALSE,results='asis'}
+con <- DBI::dbConnect(RMySQL::MySQL(), 
+  host = "databaseEndpoint",user = "Kagereki",password = "Pass")
+pt<-tbl(con, "ADMISSIONS") %>% 
+  select(SUBJECT_ID, GENDER, DOB,EXPIRE_FLAG)
+admin <- tbl(con, "ADMISSIONS")
+admin<-merge(x = admin, y = pt, by = "SUBJECT_ID", all.x = TRUE) %>% 
+  mutate(AGE = round(as.numeric(difftime(ADMITTIME,DOB, units = "days")/365),0)) %>% 
+  mutate(LOS = as.numeric(difftime(DISCHTIME,ADMITTIME, units = "hours"))) %>% 
+  mutate(AGE = ifelse(AGE<300, AGE, AGE-211)) %>% 
+  mutate(endGoldenHour = ADMITTIME + minutes(60)) %>% 
+  group_by(SUBJECT_ID) %>%
+  mutate(admissionCycle = 1:n()) %>% 
+  group_by(SUBJECT_ID) %>%
+  arrange(DISCHTIME) %>%
+  mutate(nAdmissions = n_distinct(HADM_ID)) %>% 
+  mutate(deadBefore = as.numeric(DEATHTIME-endGoldenHour)) %>% 
+  filter(deadBefore>=0) %>% 
+  mutate(DIAGNOSIS2 = tolower(DIAGNOSIS),dayOfYear = yday(ADMITTIME),Month = month(ADMITTIME)) %>% 
+  mutate(week = week(ADMITTIME),weekday = wday(ADMITTIME)) %>% 
+  mutate(year = year(ADMITTIME),hour = hour(ADMITTIME)) 
+
 ```
 
-See the help page `?xaringan::moon_reader` for all possible options that you can use.
+---
+# Data exploration.
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+
+source("Table1.R")
+trial2
+```
+
+---
+# Distribution of patients over time
+
+```{r, echo=FALSE}
+
+source("timePlot.R")
+
+plot
+
+```
+
+---
+# Derived Attributes
+
+Some considerations were done
+.pull-left[
+Age
+1. Computed by subtracting the *DOB* from the *ADMITTIME*.
+
+2. Values above 300 was adjusted by subtracting 211.
+]
+
+.pull-right[
+Datetime Features
+
+1. Day of the year;
+
+2. Week of the year;
+
+3. Month;
+
+4. Year
+
+5. Hour of the day;
+
+]
 
 ---
 
-# Objectives
+# Categorical variable encoding
 
-Some differences between using remark.js (left) and using **xaringan** (right):
-
+Some considerations were done
 .pull-left[
+Variables with high cardinality
 1. Start with a boilerplate HTML file;
 
 1. Plain Markdown;
@@ -164,6 +171,7 @@ Some differences between using remark.js (left) and using **xaringan** (right):
 ]
 
 .pull-right[
+Variables with less cardinality but need to preserve the variance
 1. Start with an R Markdown document;
 
 1. R Markdown (can embed R/other code chunks);
@@ -212,8 +220,10 @@ grep('天', dojutsu, value = TRUE)
 ```
 
 ---
+class: inverse, center, middle
 
 # R Plots
+
 
 ```{r cars, fig.height=4, dev='svg'}
 par(mar = c(4, 4, 1, .1))

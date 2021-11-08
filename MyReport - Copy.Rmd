@@ -42,30 +42,59 @@ The establishment of prognosis model for patients with suspected ACS is importan
 
 These models however have some limitations. First, most models have been developed from large randomized clinical trial populations in which the generalizability to risk prediction in the average clinician's experience is questionable[@Eagle].  
 
-Second, given the dynamic nature of the treatment environment, predicting future behavior while the treatment is underway may help the clinicians make decisions proactively.
+Second, a model given the dynamic nature of the treatment environment, predicting future behavior while the treatment is underway may help the clinicians make more. Predictive models often perform calculations during live transactions—for example, to evaluate the risk or opportunity of a given customer or transaction to guide a decision.
 
 
-This project aimed  at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause mortality. The motivation was to determine the utility of machine learning at the population level using multiple linked ICU patients' datasets.
+This project aims at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause mortality. The motivation is to determine the utility of machine learning at the population level using multiple linked ICU patients' datasets.
 
 
 
-### Project Objectives
 
-This project developed a tool for application in the decision-making environment. This was done in two steps:
+The learned representations of this comprehensible surrogate
+model, namely the decision trees and consequently extracted rules are then provided to
+the domain experts who aim to justify the decision for individual instances.
 
-1.  A binary classification model was developed. This model used:
 
-- Patient demographics 
+### Objectives
+
+This project will develop a tool for application in the decision-making environment. This is done in two steps:
+
+
+1.  A binary classification model developed. This model will use:
+
+- patient demographics 
 - Interventions within the golden hour (laboratory, medication, procedures and microbiology studies).
 
 The concept of the golden hour refers to the vital period by which a patient with a suspected cardiovascular event should be receiving definitive treatment to prevent death or irreparable damage to the heart.Although not set in stone, the chances to save a patient are usually high if substantive medical attention is given within an hour of the cardiac event[@johnson]. In this study the golden hour cut-off was 60 minutes after initial contact with the hospital. This included all interventions that were done prior to admission.
 
-2.  Process mining was  used to explain the outcome of the patient based on the care pathway followed. Two concepts were applied:
+2.  Process mining will be used to explain the outcome of the patient based on the care pathway followed. Three aspects will be checked:
 
 * Process discovery -  Processes followed by the two classes will be described. 
-* Conformance checking - The care pathway followed by both patients will be checked for conformance  with the American Heart Association(AHA) guidelines for CPR and ECC [@americanheart]. To run the process mining the timestamped interventions  (laboratory, medication, procedures) were used.
+* Conformance checking - The care pathway followed by both patients will be checked for conformance  with the American Heart Association(AHA) guidelines for CPR and ECC [@americanheart]
 
-## Project Plan
+To run the process mining the timestamped intervention in the AHA guidelines are  (laboratory, medication, procedures) are used.
+
+### Success Criteria
+
+The success of this project is to generate forward-looking, predictive insights to improve the management of the care pathway in patients suspected to have ACS by:
+
+ - Successfully predicting the ICU mortality outcome of the patient with suspected ACS based on the patient demographics and the interventions given within the first one hour.
+ - Identify patients in which undesirable events will likely be observed in the based on the interventions.
+ 
+## Situation Assessment
+This task involves more detailed fact-finding about all of the resources, constraints, assumptions, and other factors that should be considered in determining the data analysis goal and in developing the project plan.
+
+### Inventory of resources
+
+#### Software
+
+For this project the following software will be used:
+
+1. PostgreSQL
+2. R 
+3. Python 
+
+The analysis will be done on a Windows desktop and a Linux server.
 
 #### Sources of Data and Knowledge
 
@@ -87,6 +116,23 @@ The Loin[@loinc] data tables will be used to enrich the laboratory dataset.
 ##### American Heart Association guidelines for CPR and ECC  
 
 This AHA guideline[@americanheart] will be used as the gold standard for ACS workflow. The workflows for the patients in this project will be assessed for cornformity with this workflow.
+
+### Requirements, Assumptions, and Constraints
+
+For this analysis, the all the medical records were not analysed.
+
+It is also assumed that:
+
+- The patients in this population were only treated in this hospital, therefore mortalities are only captured in this hospital.
+
+- All the pre-hospitalization interventions were captured.
+
+
+
+### Risks and Contingencies
+
+- Although the process mining will give a better predictive description of the patient outcomes, alternative surrogate modelling methods like decision tree maybe used.
+
 
 ### Terminology
 
@@ -135,57 +181,16 @@ The following terms were used to identify Glycoprotein IIb/IIIa inhibitors's fro
 * Become familiar with the business terminology
 
 
-
-### Success Criteria
-
-The success of this project was to generate forward-looking, predictive insights to improve the management of the care pathway in patients suspected to have ACS by:
-
- - Successfully predicting the ICU mortality outcome of the patient with suspected ACS based on the patient demographics and the interventions given within the first one hour.
- - Identify patients in which undesirable events will likely be observed in the based on the interventions.
- 
-
-### Inventory of resources
-
-#### Software
-
-For this project the following software will be used:
-
-1. PostgreSQL
-2. R 
-3. Python 
-
-#### Computing resources 
-The analysis will be done on a Windows desktop and a Linux server. [Github repository](https://github.com/em-kagereki/Data-Mining) was used for the CI/CD pipeline.
-
-### Requirements, Assumptions, and Constraints
-
-For this analysis, the all the medical records were not analysed.
-
-It is also assumed that:
-
-- The patients in this population were only treated in this hospital, therefore mortality are only captured in this hospital.
-
-- All the pre-hospitalization interventions were captured.
-
-
-
-### Risks and Contingencies
-
-- Although the process mining will give a better predictive description of the patient outcomes, alternative surrogate modeling methods like decision tree maybe used.
-
-
-
-
-###  Data Mining Goals
+##  Data Mining Goals
 A business goal states objectives in business terminology; a data mining goal states project objectives in technical terms. For example, the business goal might be, “Increase catalog sales to existing customers,” while a data mining goal might be, “Predict how many widgets a customer will buy, given their purchases over the past three years, relevant demographic information, and the price of the item.”
 
 ### Data Mining Goals
-1. Build a binary classification machine learning model to predict all-cause mortality of patients based on
-demographics and interventions within first hour of suspected ACS event.
-2. Compare the conformity of care path in patients who died and patients who survived with the with the
-ACLS care path.
-3. Assess and report any work flow variants, and differences between patients who died and those who
-survived.
+Describe the intended outputs of the project that enable the achievement of the business objectives. Note that these are normally technical outputs.
+
+* Translate the business questions to data mining goals (e.g., a marketing campaign requires segmentation of customers in order to decide whom to approach in this campaign; the level/size of the segments should be specified).
+* Specify data mining problem type (e.g., classification, description, prediction, and clustering). For more details about data mining problem types, see Appendix 2.
+
+It may be wise to re-define the problem. For example, modeling product retention rather than customer retention when targeting customer retention delivers results too late to affect the outcome.
 
 ### Data Mining Success Criteria
 After training the binary classifier,  evaluation measures will be used to assess the performance of the model. 
@@ -209,14 +214,27 @@ The following measures will be calculated from this table:
 * Recall.
 * Specificity.
 
-To benchmark the classification model performance, the results ranging from accuracy of (70% to 90%) as
-reported in larger, though different models used in the prediction of mortality in CVDs will be used(Sherazi
-et al. 2020).
 
+
+## Project Plan
+Describe the intended plan for achieving the data mining goals and thereby achieving the business goals.
+
+### Project Plan
+List the stages to be executed in the project, together with their duration, resources required, inputs, outputs, and dependencies. Wherever possible, make explicit the large-scale iterations in the data mining process— for example, repetitions of the modeling and evaluation phases. As part of the project plan, it is also important to analyze dependencies between time schedule and risks. Mark results of these analyses explicitly in the project plan, ideally with actions and recommendations for actions if the risks are manifested.
+
+
+
+### Initial Assessment of Tools and Techniques
+At the end of the first phase, the project team performs an initial assessment of tools and techniques. Here, it is important to select a data mining tool that supports various methods for different stages of the process, since the selection of tools and techniques may influence the entire project.
+
+* Create a list of selection criteria for tools and techniques (or use an existing one if available)
+* Choose potential tools and techniques
+* Evaluate appropriateness of techniques
+* Review and prioritize applicable techniques according to the evaluation of alternative solutions
 
 # Data Understanding
 
-## Data Access
+## Collect Initial Data
 Having met the criterian  and gained access, I also learned about and calculated various severity scores for each patient which I will talk about later on in the article.
 When allowed access to the MIMIC-III database, it is suggested that you transfer all of this information into a RDMS (relational database management system) and Physionet has tutorials on how to transfer the database into a local instance of the PostgreSQL RDMS which I followed. After connecting to the PostgreSQL database, I was able to easily make SQL queries and connect my database to many helpful tools such as pgAdmin4 which provides a GUI (graphical user interface) for the database.
 
@@ -240,129 +258,228 @@ graph <- dm_create_graph(dm, rankdir = "BT")
 dm_render_graph(graph)
 ```
 
-### Selection criteria
-
-For this analysis only the patients admitted with suspected acute cardiac syndrome were included. In this subset, patients who died within the first hour of treatment were also excluded. 
-
-### Derived variables of data
-
-The following derived variables were calculated:
-
-1. Age - The age was computed by subtracting the *DOB* from the *ADMITTIME*. Any figure above 300 was adjusted by subtracting 211, since any age above 300 was ages over 89 had been  shifted such that the patient age appears to be 300 in the database.
-
-2. Splitting of Datetime Features - The following features were extracted from teh *ADMITTIME* feature:
--   Day of the year
--   Week of the year
--   Month
--  Year
--   Hour of day
-3. The Length of stay: This was calculated from the previous admissions.
-
-4. Admission cycle: If the patient had multiple admissions, what was the admission cycle in this case.
+### Initial Data Collection Report
+This project is based on the MIMIC-III database which includes data from more than 58,000 hospital admissions
+from June 2001 through October 2012. The data includes records for 38,645 adults and 7,875 neonates. The
+database has 26 tables, most of which have many attributes. If you complete this entire project, including the
+optional steps, you can run your own queries on the actual database and try to answer a question of your choice.
+However, working with this anonymized yet still-sensitive data requires that you complete a short online researchethics course and certification. Also, since the tables are large, running your queries can take a long time. For
+these reasons, the first steps of this assignment involve only accessing the public schema for this database and then
+running queries on a simplified version (C4M-MIMIC) with only a few tables, a smaller number of attributes, and
+many fewer records. The data in our C4M-MIMIC database are all fake.
 
 
+#### Selection criteria
+* Specify selection criteria (e.g., Which attributes are necessary for the specified data mining goals? Which attributes have been identified as being irrelevant? How many attributes can we handle with the chosen techniques?)
+* Select tables/files of interest
+* Select data within a table/file
+* Think about how long a history one should use (e.g., even if 18 months of data are available, only 12 months may be needed for the exercise)
 
-## Data exploration
+**Be aware that data collected from different sources may give rise to quality problems when merged (e.g., address files merged with a customer database may show inconsistencies of format, invalidity of data, etc.).**
 
-```{r, echo=FALSE}
-source("summaryStats.R")
+#### Insertion of data
+* If the data contain free text entries, do we need to encode them for modeling or do we want to group specific entries?
+* How can missing attributes be acquired?
+* How can we best extract the data?
 
-```
+Remember that some knowledge about the data may be available from non-electronic sources (e.g., from people, printed text, etc.).
 
+Remember that it may be necessary to preprocess the data (time-series data, weighted averages, etc.).
 
+## Describe Data
+Examine the “gross” properties of the acquired data and report on the results.
 
-The MIMIC III dataset contained   `r nrow(pt[ which(pt$GENDER=='F'), ])` `r round(100*nrow(pt[ which(pt$GENDER=='F'), ])/nrow(pt),2)` female  and 
- %  and  `r nrow(pt[ which(pt$GENDER=='M'), ])` `r round(100*nrow(pt[ which(pt$GENDER=='M'), ])/nrow(pt),2)` male patients. The cumulative incidence of suspected ACS was `r round(100*nrow(cardiac)/nrow(pt),2)`%.  The report is summarized in Table 1 below.
+### Data Description Report
+Describe the data that has been acquired, including the format of the data, the quantity of the data (e.g., the number of records and fields within each table), the identities of the fields, and any other surface features that have been discovered.
 
-```{r,echo=FALSE,message=FALSE,warning=FALSE}
-source("Table1.R")
-trial2
-```
+#### Volumetric analysis of data
+* Identify data and method of capture
+* Access data sources
+* Use statistical analyses if appropriate
+* Report tables and their relations
+* Check data volume, number of multiples, complexity
+* Note if the data contain free text entries
 
-These data was subset using a total of unique subset of the words as shown below.
+#### Attribute types and values
+* Check accessibility and availability of attributes
+* Check attribute types (numeric, symbolic, taxonomy, etc.)
+* Check attribute value ranges
+* Analyze attribute correlations
+* Understand the meaning of each attribute and attribute value in business terms
+* For each attribute, compute basic statistics (e.g., compute distribution, average, max, min, standard deviation, variance, mode, skewness, etc.)
+* Analyze basic statistics and relate the results to their meaning in business terms
+* Decide if the attribute is relevant for the specific data mining goal
+* Determine if the attribute meaning is used consistently
+* Interview domain experts to obtain their opinion of attribute relevance
+* Decide if it is necessary to balance the data (based on the modeling techniques to be used)
 
+#### Keys
+* Analyze key relationships
+* Check amount of overlaps of key attribute values across tables
 
-In addition the patients were seen over a span of time ranging from `r min(lubridate::date(cardiac$ADMITTIME))` to `r max(lubridate::date(cardiac$ADMITTIME))`. This temporal distribution is shown in the chart below:
+#### Review assumptions/goals
+* Update list of assumptions, if necessary
 
-```{r, echo=FALSE}
+## Explore Data
+This task tackles the data mining questions that can be addressed using querying, visualization, and reporting techniques. These analyses may directly address the data mining goals. However, they may also contribute to or refine the data description and quality reports, and feed into the transformation and other data preparation steps needed before further analysis can occur.
 
-source("timePlot.R")
+### Data Exploration Report
+Describe the results of this task, including first findings or initial hypotheses and their impact on the remainder of the project. The report may also include graphs and plots that indicate data characteristics or point to interesting data subsets worthy of further examination.
 
-plot
+#### Data exploration
+* Analyze properties of interesting attributes in detail (e.g., basic statistics, interesting sub-populations)
+* Identify characteristics of sub-populations
 
-```
+#### Form suppositions for future analysis
+* Consider and evaluate information and findings in the data descriptions report
+* Form a hypothesis and identify actions
+* Transform the hypothesis into a data mining goal, if possible
+* Clarify data mining goals or make them more precise. A “blind” search is not necessarily useless, but a more directed search toward business objectives is preferable.
+* Perform basic analysis to verify the hypothesis
 
+## Verify Data Quality
+Examine the quality of the data, addressing questions such as: Is the data complete (does it cover all the cases required)? Is it correct or does it contain errors? If there are errors, how common are they? Are there missing values in the data? If so, how are they represented, where do they occur, and how common are they?
 
+### Data Quality Report
+List the results of the data quality verification; if there are quality problems, list possible solutions.
 
+* Identify special values and catalog their meaning
 
-### Volumetric analysis of data
-The total dataset was estimated to be more than 100GBs of data. The selected subset of data tables was about 3.47 GBs.
+#### Review keys, attributes
+* Check coverage (e.g., whether all possible values are represented)
+* Check keys
+* Verify that the meanings of attributes and contained values fit together
+* Identify missing attributes and blank fields
+* Establish the meaning of missing data
+* Check for attributes with different values that have similar meanings (e.g., low fat, diet)
+* Check spelling and format of values (e.g., same value but sometimes beginning with a lower-case letter, sometimes with an upper-case letter)
+* Check for deviations, and decide whether a deviation is “noise” or may indicate an interesting phenomenon
+* Check for plausibility of values, (e.g., all fields having the same or nearly the same values)
 
+Review any attributes that give answers that conflict with common sense (e.g., teenagers with high income levels).
 
-### Attribute types and values
+Use visualization plots, histograms, etc. to reveal inconsistencies in the data.
 
-And see Table \@ref(dtypes).
+#### Data quality in flat files
+* If data are stored in flat files, check which delimiter is used and whether it is used consistently within all attributes
+* If data are stored in flat files, check the number of fields in each record to see if they coincide
 
-```{r,dtypes, echo=FALSE }
+#### Noise and inconsistencies between sources
+* Check consistencies and redundancies between different sources
+* Plan for dealing with noise
+* Detect the type of noise and which attributes are affected
 
-d<-data.frame(dlookr::diagnose(cardiac))
-#d
-knitr::kable(d,
-             caption = "Attributes and the level of measurement")
-```
-             
+Remember that it may be necessary to exclude some data since they do not exhibit either positive or negative behavior (e.g., to check on customers’ loan behavior, exclude all those who have never borrowed, do not finance a home mortgage, those whose mortgage is nearing maturity, etc.).
 
-             
-### Assumptions/Limitations
-
-- The patients in this population were only treated in this hospital, therefore all important events like hospitalization and mortality are only captured
-in this hospital.
-- All the pre-hospitalization interventions were captured.
-- The unit of analysis is the admission
-
+Review whether assumptions are valid or not, given the current information on data and business knowledge.
 
 # Data Preparation
+**Dataset:** These are the dataset(s) produced by the data preparation phase, used for modeling or for the major analysis work of the project.
 
-Data quality was assessed dimensions of completeness, uniqueness, validity, accuracy and consistency. Any issue picked was addressed in the data cleaning step below.
+**Dataset description:** This is the description of the dataset(s) used for the modeling or for the major analysis work of the project.
 
+## Select Data
+Decide on the data to be used for analysis. Criteria include relevance to the data mining goals, quality, and technical constraints such as limits on data volume or data types.
 
-## Data Cleaning
-1. There were no duplicates.
-2. Completeness:
-- Any treatment offered before admission had missing admission ID(*ADMISSION.HADM_ID*). This was inferred from the patient id (*ADMISSION.SUBJECT_ID*) and treatment period.
-- The language(*ADMISSION.LANGUAGE*) and ethnicity (*ADMISSION.ETHNICITY*). These were replaced with "UNKNOWN"
-3. Consistency:
-- The diagnosis(*ADMISSION.DIAGNOSIS*) provides a preliminary, free text diagnosis for the patient on hospital admission as assigned by the admitting clinician and does not use a systematic ontology. Data cleaning was done by removing unnecessary text and ensuring common acronyms and abbreviations referred to the same diagnosis. 
-- The Loinc table was used to identify the actual test.
+### Rationale for Inclusion/Exclusion
+List the data to be used/excluded and the reasons for these decisions.
 
+* Collect appropriate additional data (from different sources—in-house as well as externally)
+* Perform significance and correlation tests to decide if fields should be included
+* Reconsider Data Selection Criteria in light of experiences of data quality and data exploration (i.e., may wish include/exclude other sets of data)
+* Reconsider Data Selection Criteria in light of experience of modeling (i.e., model assessment may show that other datasets are needed)
+* Select different data subsets (e.g., different attributes, only data which meet certain conditions)
+* Consider the use of sampling techniques (e.g., A quick solution may involve splitting test and training datasets or reducing the size of the test dataset, if the tool cannot handle the full dataset. It may also be useful to have weighted samples to give different importance to different attributes or different values of the same attribute.)
+* Document the rationale for inclusion/exclusion
+* Check available techniques for sampling data
 
+Based on Data Selection Criteria, decide if one or more attributes are more important than others and weight the attributes accordingly. Decide, based on the context (i.e., application, tool, etc.), how to handle the weighting.
 
-## Categorical variable encoding
+## Clean Data
+Raise the data quality to the level required by the selected analysis techniques. This may involve the selection of clean subsets of the data, the insertion of suitable defaults, or more ambitious techniques such as the estimation of missing data by modeling.
 
-1. Categorical variables with high cardinality: diagnoses, medicine, procedures.
-- This target encoding/hash encoding was used.
-2. Categorical variables with less cardinality but need to preserve the variance: gender, 
-- Frequency encoding was used
+### Data Cleaning Report
+Describe the decisions and actions that were taken to address the data quality problems reported during the Verify Data Quality Task. If the data are to be used in the data mining exercise, the report should address outstanding data quality issues and what possible effect this could have on the results.
 
-## Dimension reduction
+* Reconsider how to deal with any observed type of noise
+* Correct, remove, or ignore noise
+* Decide how to deal with special values and their meaning. The area of special values can give rise to many strange results and should be carefully examined. Examples of special values could arise through taking results of a survey where some questions were not asked or not answered. This might result in a value of 99 for unknown data. For example, 99 for marital status or political affiliation. Special values could also arise when data is truncated—e.g., 00 for 100-year-old people or all cars with 100,000 km on the odometer.
+* Reconsider Data Selection Criteria in light of experiences of data cleaning (i.e., you may wish to include/exclude other sets of data).
 
-The final dataset contained x columns.
+Remember that some fields may be irrelevant to the data mining goals and, therefore, noise in those fields has no significance. However, if noise is ignored for these reasons, it should be fully documented as the circumstances may change later.
 
-Dimension reduction was done using 
+## Construct Data
+This task includes constructive data preparation operations such as the production of derived attributes, complete new records, or transformed values for existing attributes.
 
-https://towardsdatascience.com/dimensionality-reduction-for-data-visualization-pca-vs-tsne-vs-umap-be4aa7b1cb29
+* Check available construction mechanisms with the list of tools suggested for the project
+* Decide whether it is best to perform the construction inside the tool or outside (i.e., which is more efficient, exact, repeatable)
+* Reconsider Data Selection Criteria Data Selection Criteria in light of experiences of data construction (i.e., you may wish include/exclude other sets of data)
 
-## Final Dataset
+### Derived Attributes
+Derived attributes are new attributes that are constructed from one or more existing attributes in the same record. An example might be: area = length * width.
 
-Finally the chosen dataset factoring in 90% of the variance was factored in. This was used for the final analysis.
+Why should we need to construct derived attributes during the course of a data mining investigation? It should not be thought that only data from databases or other sources should be used in constructing a model. Derived attributes might be constructed because:
 
+* Background knowledge convinces us that some fact is important and ought to be represented although we have no attribute currently to represent it
+* The modeling algorithm in use handles only certain types of data—for example we are using linear regression and we suspect that there are certain non-linearities that will be not be included in the model
+* The outcome of the modeling phase suggests that certain facts are not being covered
 
+#### Derived attributes
+* Decide if any attribute should be normalized (e.g., when using a clustering algorithm with age and income, in certain currencies, the income will dominate)
+* Consider adding new information on the relevant importance of attributes by adding new attributes (for example, attribute weights, weighted normalization)
+* How can missing attributes be constructed or imputed? [Decide type of construction (e.g., aggregate, average, induction).]
+* Add new attributes to the accessed data
 
-### Splitting of machine learning dataset
+Before adding Derived Attributes, try to determine if and how they ease the model process or facilitate the modeling algorithm. Perhaps “income per person” is a better/easier attribute to use than “income per household.” Do not derive attributes simply to reduce the number of input attributes.
+
+Another type of derived attribute is the single-attribute transformation, usually performed to fit the needs of the modeling tools.
+
+#### Single-attribute transformations
+* Specify necessary transformation steps in terms of available transformation facilities (for example, change a binning of a numeric attribute)
+* Perform transformation steps
+
+Transformations may be necessary to change ranges to symbolic fields (e.g., ages to age ranges) or symbolic fields (“definitely yes,” “yes,” “don’t know,” “no”) to numeric values. Modeling tools or algorithms often require them.
+
+### Generated Records
+Generated records are completely new records, which add new knowledge or represent new data that is not otherwise represented (e.g., having segmented the data, it may be useful to generate a record to represent the prototypical member of each segment for further processing).
+
+Check for available techniques if needed (e.g., mechanisms to construct prototypes for each segment of segmented data).
+
+## Integrate Data
+These are methods for combining information from multiple tables or other information sources to create new records or values.
+
+### Merged Data
+Merging tables refers to joining together two or more tables that have different information about the same objects. At this stage, it may also be advisable to generate new records. It may also be recommended to generate aggregate values.
+
+Aggregation refers to operations where new values are computed by summarizing information from multiple records and/or tables.
+
+* Check if integration facilities are able to integrate the input sources as required
+* Integrate sources and store results
+* Reconsider Data Selection Criteria in light of experiences of data integration (i.e., you may wish to include/exclude other sets of data)
+
+Remember that some knowledge may be contained in non-electronic format.
+
+## Format Data
+Formatting transformations refers primarily to syntactic modifications made to the data that do not change its meaning, but might be required by the modeling tool.
+
+### Reformatted Data
+Some tools have requirements on the order of the attributes, such as the first field being a unique identifier for each record or the last field being the outcome field the model is to predict.
+
+#### Rearranging attributes
+Some tools have requirements on the order of the attributes, such as the first field being a unique identifier for each record or the last field being the outcome field the model is to predict.
+
+#### Reordering records
+It might be important to change the order of the records in the dataset. Perhaps the modeling tool requires that the records be sorted according to the value of the outcome attribute.
+
+#### Reformatted within-value
+* These are purely syntactic changes made to satisfy the requirements of the specific modeling tool
+* Reconsider Data Selection Criteria in light of experiences of data cleaning (i.e., you may wish to include/exclude other sets of data)
+
+## Dataset
 These are the dataset(s) produced by the data preparation phase, used for modeling or for the major analysis work of the project.
 
-## Construction of event logs
-
+### Dataset Description
+This is the description of the dataset(s) used for the modeling or for the major analysis work of the project.
 
 # Modeling
 

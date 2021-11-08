@@ -2,6 +2,7 @@
 #knitr::write_bib(c(.packages(), "data.table"), "packages.bib")
 
 setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4")
+source("Global.R")
 admin<-read.csv("ADMISSIONS.csv") 
 pt<-read.csv("PATIENTS.csv") %>% 
   select(SUBJECT_ID, GENDER, DOB,EXPIRE_FLAG)
@@ -47,7 +48,6 @@ cardiacSyndromes <- admin %>%
 #Exclude some accidental key word : ludwig angina
 
 cardiacSyndromes <- cardiacSyndromes[!grepl("ludwigs",cardiacSyndromes$DIAGNOSIS2),]
- 
 
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS2, "&", "and")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3, "[[:punct:]]", "/")
@@ -321,24 +321,6 @@ serviceGroup<-cbind(group$HADM_ID,serviceGroup)
 names(serviceGroup)[1] <- "HADM_ID"
 
 
-services2<-merge(x=cardiacSyndromes2,y=services,by='HADM_ID',x.all=TRUE) %>% 
-  mutate(TRANSFERTIME2 = ymd_hms(TRANSFERTIME)) %>% 
-  mutate(Checktime = ifelse(endGoldenHour>=TRANSFERTIME2, "After", "Before")) %>% 
-  filter(Checktime=="Before") %>% 
-  select(HADM_ID,PREV_SERVICE,CURR_SERVICE) %>% 
-  unite(cService, PREV_SERVICE, CURR_SERVICE, sep = "_", remove = FALSE) %>% 
-  select(HADM_ID,cService)
-services3<-services2 %>% count(HADM_ID, cService, sort = TRUE)
-servicesWide <- services3 %>% 
-  spread(cService, n) %>% 
-  replace(is.na(.), 0) 
-servicesWide<-merge(x=cardiacSyndromes2, y=servicesWide, by="HADM_ID", all.x = TRUE) %>% 
-  replace(is.na(.), 0)%>% 
-  select(-SUBJECT_ID,-endGoldenHour)
-checkServicesBeforeAdmin<-servicesWide %>% filter(HADM_ID==0) 
-nrow(checkServicesBeforeAdmin)
-
-
 ## Procedures
 procedures<-read.csv("PROCEDUREEVENTS_MV.csv")
 D_ITEM<-read.csv("D_ITEMS.csv")
@@ -350,23 +332,13 @@ procedures<-procedures[!duplicated(procedures$combined), ] # Here we remove the 
 group<-aggregate(procedures$LABEL, list(procedures$HADM_ID), paste, collapse="/")
 names(group)[1] <- "HADM_ID"
 procW<-merge(x=group,y=cardiacSyndromes2, by = "HADM_ID",x.all=TRUE)
-
 procW$count <- sapply(strsplit(procW$x,'/'), uniqueN)
 proc<-data.frame(str_split_fixed(procW$x, "/", max(procW$count)))
 
+source("Recoding.R")
 
 
 
-logProdecures<-procedures
-procWide<-merge(x=procedures,y=cardiacSyndromes2, by = "HADM_ID",x.all=TRUE) %>% 
-  mutate(STARTTIME2 = ymd_hms(STARTTIME)) %>% 
-  mutate(Checktime = ifelse(endGoldenHour>=STARTTIME2, "After", "Before")) %>% 
-  filter(Checktime=="Before") %>% 
-  select(HADM_ID,LABEL) %>% count(HADM_ID, LABEL, sort = TRUE)%>% 
-  spread(LABEL, n) %>%
-  replace(is.na(.), 0)
-procWide<-merge(x=cardiacSyndromes2, y=procWide, by="HADM_ID", all.x = TRUE) %>% 
-  replace(is.na(.), 0)
 microb<-read.csv("MICROBIOLOGYEVENTS.csv") %>% 
   select(-ROW_ID,-SUBJECT_ID)
 microb<-merge(x=cardiacSyndromes2,y=microb,by='HADM_ID',x.all=TRUE) %>% 
@@ -423,7 +395,6 @@ medMap$drug2 <- gsub("drug2","",medMap$drug2)
 medMap$drug2<-trimws(medMap$drug2)
 med2<-merge(x=meds, y = medMap, by ="drug2", all.x = TRUE ) %>% 
   select(-drug2,-DRUG)
-
 medGroup <- med2 %>%
   group_by(HADM_ID) %>%
   summarise(all_names = paste(value, collapse = "/"))
@@ -432,7 +403,6 @@ mediGroup<-data.frame(str_split_fixed(medGroup$all_names, "/", 144))%>%
   replace(is.na(.), 0)
 mediGroup<-cbind(medGroup$HADM_ID,mediGroup)
 names(mediGroup)[1] <- "HADM_ID"
-
 for(i in 1:ncol(mediGroup)) {    
   mediGroup[ , i][mediGroup[ , i]==""]<-0
   # for-loop over columns
@@ -441,42 +411,21 @@ for(i in 1:ncol(mediGroup)) {
 
 
 
-meds<-meds %>% 
-  mutate(drug2 = tolower(DRUG)) %>% 
-  filter( grepl(paste(subset, collapse="|"),drug2)) %>% 
-  mutate(DRUG = case_when(grepl("aspirin", drug2) ~ "Aspirin",
-                          grepl("morphine", drug2) ~ "Morphine",
-                          grepl((paste(HMGCoA, collapse="|")), drug2) ~ "HMGCoA",
-                          grepl((paste(ACE, collapse="|")), drug2) ~ "ACE Inhibitors",
-                          grepl((paste(betaBlockers, collapse="|")), drug2) ~ "Beta blockers",
-                          grepl((paste(glycoproteinInhibitors, collapse="|")), drug2) ~ "GpIIb/IIIa inhibitors",
-                          grepl("nitroglycerin", drug2, ignore.case = TRUE) ~"Nitroglycerine")) %>% 
-  na.omit() %>%
-  mutate(STARTDATE=ymd_hms(STARTDATE,tz="Europe/London")) %>% 
-  mutate(ENDDATE=ymd_hms(ENDDATE,tz="Europe/London")) %>% 
-  unite(case_id, SUBJECT_ID,HADM_ID,DRUG, sep = "-", remove = FALSE) %>% 
-  group_by(case_id) %>% 
-  mutate(start = min(STARTDATE),complete = max(ENDDATE)) %>% 
-  select(-X.1,-X,-STARTDATE,-ENDDATE,-drug2) %>% 
-  distinct(case_id, .keep_all= TRUE) %>% 
-  unite(case_id, SUBJECT_ID,HADM_ID, sep = "-", remove = FALSE) %>% 
-  group_by(case_id) %>% 
-  arrange(start) %>% 
-  mutate(activity_instance = 1:n())
 
 
 ## Write flat files:
 # Classification:
 #write.csv(cardiacSyndromes,"cardiacSyndromes.csv")
-#write.csv(servicesWide,"servicesWide.csv")
-#write.csv(labWide,"labWide.csv")
-#write.csv(procWide,"procWide.csv")
-#write.csv(microbWide,"microbWide.csv")
+#write.csv(serviceGroup,"serviceGroup.csv")
+#write.csv(labWide,"labGroup.csv")
+#write.csv(proc,"procGroup.csv")
+#write.csv(microGroup,"microGroup.csv")
+#write.csv(mediGroup, "mediGroup.csv")
+
 
 # Process mining:
 #write.csv(logProdecures,"logProdecures.csv")
 #write.csv(microbWide,"microbWide.csv")
-#write.csv(medication, "medication.csv")
 
 
 
