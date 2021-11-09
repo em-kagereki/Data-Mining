@@ -26,3 +26,6 @@ plot<-ggplot(data, aes(x = year, y = n)) +
   scale_color_manual(values = c("#00AFBB", "#E7B800")) +
   theme_minimal()
 
+
+
+

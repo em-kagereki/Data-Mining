@@ -1,0 +1,248 @@
+lr_recipe <- 
+  recipe(EXPIRE_FLAG ~ ., data = data_training) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>%
+  step_corr(all_predictors(), threshold = 0.7, method = "spearman")
+
+
+## CV folds:
+
+cv_folds <-
+  vfold_cv(data_training, 
+           v = 5, 
+           strata = EXPIRE_FLAG) 
+
+# Logistic regression:
+log_spec <- # your model specification
+  logistic_reg() %>%  # model type
+  set_engine(engine = "glm") %>%  # model engine
+  set_mode("classification") # model mode
+
+## Logistic Workflow :
+log_wflow <- 
+  workflow() %>% 
+  add_recipe(lr_recipe) %>%   
+  add_model(log_spec)   
+
+# Fit model
+log_res <- 
+  log_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(
+      save_pred = TRUE)
+  ) 
+log_res %>%  collect_metrics(summarize = FALSE)
+
+log_pred <- 
+  log_res %>%
+  collect_predictions()
+
+log_pred %>% 
+  conf_mat(EXPIRE_FLAG, .pred_0)
+
+# Random forest
+rf_spec <- 
+  rand_forest() %>% 
+  set_engine("ranger", importance = "impurity") %>% 
+  set_mode("classification")
+
+rf_wflow <-
+  workflow() %>%
+  add_recipe(lr_recipe) %>% 
+  add_model(rf_spec) 
+## Fit model
+
+rf_res <-
+  rf_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)
+  ) 
+
+rf_res %>%  collect_metrics(summarize = TRUE)
+
+# Xgboost
+library(xgboost)
+xgb_spec <- 
+  boost_tree() %>% 
+  set_engine("xgboost") %>% 
+  set_mode("classification") 
+
+xgb_wflow <-
+  workflow() %>%
+  add_recipe(lr_recipe) %>% 
+  add_model(xgb_spec)
+
+xgb_res <- 
+  xgb_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)
+  ) 
+
+xgb_res %>% collect_metrics(summarize = TRUE)
+
+## KNN
+knn_spec <- 
+  nearest_neighbor(neighbors = 4) %>% # we can adjust the number of neighbors 
+  set_engine("kknn") %>% 
+  set_mode("classification")
+
+## Knn workflow
+knn_wflow <-
+  workflow() %>%
+  add_recipe(lr_recipe) %>% 
+  add_model(knn_spec)
+
+library(kknn)
+
+##KNN model
+knn_res <- 
+  knn_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)
+  ) 
+knn_res %>% collect_metrics(summarize = TRUE)
+
+
+
+library(keras)
+
+nnet_spec <-
+  mlp() %>%
+  set_mode("classification") %>% 
+  set_engine("keras", verbose = 0) 
+
+## ANN workflow:
+nnet_wflow <-
+  workflow() %>%
+  add_recipe(lr_recipe) %>% 
+  add_model(nnet_spec)
+
+#nnet_res <- 
+#  nnet_wflow %>% 
+#  fit_resamples(
+#    resamples = cv_folds, 
+ #   metrics = metric_set(
+ #     f_meas, 
+ #     accuracy, kap,
+ #     roc_auc, sens, spec),
+ #   control = control_resamples(save_pred = TRUE)
+ # ) 
+
+
+
+log_metrics <- 
+  log_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Logistic Regression") # add the name of the model to every row
+
+rf_metrics <- 
+  rf_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Random Forest")
+
+xgb_metrics <- 
+  xgb_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "XGBoost")
+
+knn_metrics <- 
+  knn_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Knn")
+
+# nnet_metrics <- 
+#   nnet_res %>% 
+#   collect_metrics(summarise = TRUE) %>%
+#   mutate(model = "Neural Net")
+
+# create dataframe with all models
+model_compare <- bind_rows(
+  log_metrics,
+  rf_metrics,
+  xgb_metrics,
+  knn_metrics,
+  # nnet_metrics
+) 
+
+# change data structure
+model_comp <- 
+  model_compare %>% 
+  select(model, .metric, mean, std_err) %>% 
+  pivot_wider(names_from = .metric, values_from = c(mean, std_err)) 
+
+# show mean F1-Score for every model
+model_comp %>% 
+  arrange(mean_f_meas) %>% 
+  mutate(model = fct_reorder(model, mean_f_meas)) %>% # order results
+  ggplot(aes(model, mean_f_meas, fill=model)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_brewer(palette = "Blues") +
+  geom_text(
+    size = 3,
+    aes(label = round(mean_f_meas, 2), y = mean_f_meas + 0.08),
+    vjust = 1
+  )
+
+
+## Model tuning
+
+rf_mod <- 
+  rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>% 
+  set_engine("ranger", num.threads = cores) %>% 
+  set_mode("classification")
+rf_workflow <- 
+  workflow() %>% 
+  add_model(rf_mod) %>% 
+  add_recipe(rf_recipe)
+
+
+set.seed(345)
+rf_res <- 
+  rf_workflow %>% 
+  tune_grid(val_set,
+            grid = 25,
+            control = control_grid(save_pred = TRUE),
+            metrics = metric_set(roc_auc))
+
+rf_best <- 
+  rf_res %>% 
+  select_best(metric = "roc_auc")
+rf_best
+
+rf_res %>% 
+  collect_predictions()
+
+rf_auc_best <- 
+  rf_res %>% 
+  collect_predictions(parameters = rf_best) %>% 
+  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
+  mutate(model = "Tuned Random Forest")
+
+bind_rows(rf_auc, lr_auc) %>% 
+  ggplot(aes(x = 1 - specificity, y = sensitivity, col = model)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal() + 
+  scale_color_viridis_d(option = "plasma", end = .6)

@@ -7,7 +7,6 @@ library(table1)
 library(alphaOutlier)
 library(boot) 
 library(htmlTable)
-library(ggplot2)
 library(scales)
 library(factoextra)
 library(lubridate)
@@ -18,16 +17,14 @@ library(data.table)
 library(wordcloud2) 
 
 library(knitr)
-library(ggplot2)
 library(broom)
 library(devtools)
 library(gtsummary)
 library(tidyverse)
 library(tidyr)
-
+library(gtsummary)
 
 # Core Tidyverse
-library(tidyverse)
 library(glue)
 library(forcats)
 
@@ -51,9 +48,11 @@ library(keras)
 
 ## Information gain
 
+#remotes::install_github("davidsjoberg/ggsankey")
+library(ggsankey)
 
-library(FSelector)
-library(FSelectorRcpp)
+#library(FSelector)
+#library(FSelectorRcpp)
 
 ## Process Mining
 
@@ -64,8 +63,24 @@ library(FeatureHashing)
 # install.packages("stevetemplates")
 ## https://libscie.github.io/rmarkdown-workshop/handout.html
 
+library(PCAtools)
+library(ggplot2)
 
-
+library(gbm)
+library(caret)
+library(glmnet)
+set.seed(123)
+library(parsnip)
+library(recipes)
+library(workflows)
+library(tune)
+library(ranger)
+library(vip)
+library(xgboost)
+library(kknn) #Knn model
+library(keras) #ANN
+library(workflows)
+library(caret)
 
 keyword<- c("stemi","acute coronary syndrome","angina","tachycardia","aortic aneurysm","pericardi","ortic dissection",
             "coronary artery dissection","cardiomyopathy","heart failure","mitral valve disease","mitral stenosis",
@@ -90,3 +105,7 @@ betaBlockers<-c("acebutolol","atenolol","betaxolol","bisoprolol",
 glycoproteinInhibitors<-c("abciximab","eptifibatide","tirofiban","roxifiban","orbofiban")
 
 subset<- c(medList, P2y12,HMGCoA,ACE,betaBlockers,glycoproteinInhibitors)
+
+
+
+# git add . && git commit -am "Report" && git push 

@@ -1,9 +1,7 @@
 # https://stefvanbuuren.name/fimd/sec-MCAR.html
 
 setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4")
-library(gtsummary)
-library(tidyverse)
-library(tidyr)
+
 data <-read.csv("cardiacSyndromes.csv") %>% 
   mutate_all(na_if,"") %>% 
   mutate(MARITAL_STATUS = if_else(is.na(MARITAL_STATUS), "UNKNOWN", MARITAL_STATUS)) 

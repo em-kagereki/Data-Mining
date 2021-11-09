@@ -9,7 +9,7 @@ output:
     toc: yes
     toc_depth: '2'
   word_document:
-    toc: yes
+    toc: yes 
     toc_depth: '2'
   html_document:
     number_sections: yes
@@ -21,6 +21,7 @@ output:
 ## set output options
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 options(scipen=999)
+source("Global.R")
 
 ## load packages
 ```
@@ -272,27 +273,23 @@ source("summaryStats.R")
 
 
 The MIMIC III dataset contained   `r nrow(pt[ which(pt$GENDER=='F'), ])` `r round(100*nrow(pt[ which(pt$GENDER=='F'), ])/nrow(pt),2)` female  and 
- %  and  `r nrow(pt[ which(pt$GENDER=='M'), ])` `r round(100*nrow(pt[ which(pt$GENDER=='M'), ])/nrow(pt),2)` male patients. The cumulative incidence of suspected ACS was `r round(100*nrow(cardiac)/nrow(pt),2)`%.  The report is summarized in Table 1 below.
+ %  and  `r nrow(pt[ which(pt$GENDER=='M'), ])` `r round(100*nrow(pt[ which(pt$GENDER=='M'), ])/nrow(pt),2)` male patients. The cumulative incidence of suspected ACS was `r round(100*nrow(biodata)/nrow(pt),2)`%.  The report is summarized in Table 1 below.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
-source("Table1.R")
-trial2
+source("summaryStats.R")
+#trial2
 ```
 
 These data was subset using a total of unique subset of the words as shown below.
 
 
-In addition the patients were seen over a span of time ranging from `r min(lubridate::date(cardiac$ADMITTIME))` to `r max(lubridate::date(cardiac$ADMITTIME))`. This temporal distribution is shown in the chart below:
+In addition the patients were seen over a span of time ranging from `r min(lubridate::date(biodata$ADMITTIME))` to `r max(lubridate::date(biodata$ADMITTIME))`. This temporal distribution is shown in the chart below:
 
 ```{r, echo=FALSE}
 
-source("timePlot.R")
-
-plot
+dataPlot
 
 ```
-
-
 
 
 ### Volumetric analysis of data
@@ -305,13 +302,11 @@ And see Table \@ref(dtypes).
 
 ```{r,dtypes, echo=FALSE }
 
-d<-data.frame(dlookr::diagnose(cardiac))
+d<-data.frame(dlookr::diagnose(biodata))
 #d
 knitr::kable(d,
              caption = "Attributes and the level of measurement")
 ```
-             
-
              
 ### Assumptions/Limitations
 
@@ -346,9 +341,17 @@ Data quality was assessed dimensions of completeness, uniqueness, validity, accu
 
 ## Dimension reduction
 
-The final dataset contained x columns.
+Principal componet analysis was used to reduce the dimensionality of the data.
 
-Dimension reduction was done using 
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+source("Step3_featureEngineering.R")
+#pcaPlot
+
+#screePlot
+```
+
+
+
 
 https://towardsdatascience.com/dimensionality-reduction-for-data-visualization-pca-vs-tsne-vs-umap-be4aa7b1cb29
 
@@ -366,49 +369,362 @@ These are the dataset(s) produced by the data preparation phase, used for modeli
 
 # Modeling
 
-## Select Modeling Techniques
-As the first step in modeling, select the actual initial modeling technique. If multiple techniques are to be applied, perform this task separately for each technique.
+## Data splitting & resampling
 
-Remember that not all tools and techniques are applicable to each and every task. For certain problems, only some techniques are appropriate (See Appendix 2, where techniques appropriate for certain data mining problem types are discussed in more detail). “Political requirements” and other constraints further limit the choices available to the data mining engineer. It may be that only one tool or technique is available to solve the problem at hand—and that the tool may not be absolutely the best, from a technical standpoint.
 
-### Modeling Technique
-Record the actual modeling technique that is used.
+For the data splitting strategy, 25% of the hospital admissions were reserved to the test set. Since the outcome variable(mortality) if slightly imbalances   stratified random sampling was used. 
 
-Decide on appropriate technique for exercise, bearing in mind the tool selected.
+The   k-fold cross-validation resampling method was used to create 10  different resamples of the training set (which were further split into analysis and assessment sets), producing 10 different performance metrics that were then aggregated.
 
-### Modeling Assumptions
-Many modeling techniques make specific assumptions about the data.
 
-* Define any built-in assumptions made by the technique about the data (e.g., quality, format, distribution)
-* Compare these assumptions with those in the Data Description Report
-* Make sure that these assumptions hold and go back to the Data Preparation Phase, if necessary
+Subsequently 20% of the  hospital admissions were allocated  to the validation set and 80% of the hospital stays to the training set. 
 
-## Generate Test Design
-Prior to building a model, it is necessary to define a procedure to test the model’s quality and validity. For example, in supervised data mining tasks such as classification, it is common to use error rates as quality measures for data mining models. Therefore, the test design specifies that the dataset should be separated into training and test sets. The model is built on the training set and its quality estimated on the test set.
 
-### Test Design
-Describe the intended plan for training, testing, and evaluating the models. A primary component of the plan is to decide how to divide the available dataset into training data, test data, and validation test sets.
 
-* Check existing test designs for each data mining goal separately
-* Decide on necessary steps (number of iterations, number of folds, etc.)
-* Prepare data required for test
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
 
-## Build Model
-Run the modeling tool on the prepared dataset to create one or more models.
+data2$EXPIRE_FLAG<-as.factor(data2$EXPIRE_FLAG) 
+data2<-data2%>% 
+  select(-FreqDISCHARGE_LOCATION)
+splits<- initial_split(data2%>% select(-HADM_ID),
+                       prop =3/4,
+                       strata = EXPIRE_FLAG)
 
-### Parameter Settings
-With any modeling tool, there are often a large number of parameters that can be adjusted. List the parameters and their chosen values, along with the rationale for the choice.
+data_training <- training(splits)
+data_test  <- testing(splits)
 
-* Set initial parameters
-* Document reasons for choosing those values
+data_training %>% 
+  count(EXPIRE_FLAG) %>% 
+  mutate(prop = n/sum(n))
 
-### Models
-Run the modeling tool on the prepared dataset to create one or more models.
+data_test  %>% 
+  count(EXPIRE_FLAG) %>% 
+  mutate(prop = n/sum(n))
 
-* Run the selected technique on the input dataset to produce the model
-* Post-process data mining results (e.g., edit rules, display trees)
 
-### Model Description
+val_set <- validation_split(data_training, 
+                            strata = EXPIRE_FLAG, 
+                            prop = 0.80)
+val_set
+
+
+
+
+lr_recipe <- 
+  recipe(EXPIRE_FLAG ~ ., data = data_training) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>%
+  step_corr(all_predictors(), threshold = 0.7, method = "spearman")
+
+
+## CV folds:
+
+cv_folds <-
+  vfold_cv(data_training, 
+           v = 5, 
+           strata = EXPIRE_FLAG) 
+
+# Logistic regression:
+log_spec <- # your model specification
+  logistic_reg() %>%  # model type
+  set_engine(engine = "glm") %>%  # model engine
+  set_mode("classification") # model mode
+
+## Logistic Workflow :
+log_wflow <- 
+  workflow() %>% 
+  add_recipe(lr_recipe) %>%   
+  add_model(log_spec)   
+
+# Fit model
+log_res <- 
+  log_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(
+      save_pred = TRUE)
+  ) 
+log_res %>%  collect_metrics(summarize = FALSE)
+
+log_pred <- 
+  log_res %>%
+  collect_predictions()
+
+log_auc <- 
+  log_res %>% 
+  collect_predictions(parameters = log_res) %>% 
+  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
+  mutate(model = "Logistic regression")
+
+
+# Random forest
+rf_spec <- 
+  rand_forest() %>% 
+  set_engine("ranger", importance = "impurity") %>% 
+  set_mode("classification")
+
+rf_wflow <-
+  workflow() %>%
+  add_recipe(lr_recipe) %>% 
+  add_model(rf_spec) 
+## Fit model
+
+rf_res <-
+  rf_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)
+  ) 
+
+rf_res %>%  collect_metrics(summarize = TRUE)
+
+
+rf_pred <- 
+  rf_res %>%
+  collect_predictions()
+
+rf_auc <- 
+  rf_res %>% 
+  collect_predictions(parameters = rf_res) %>% 
+  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
+  mutate(model = "Random forest")
+
+# Xgboost
+xgb_spec <- 
+  boost_tree() %>% 
+  set_engine("xgboost") %>% 
+  set_mode("classification") 
+
+xgb_wflow <-
+  workflow() %>%
+  add_recipe(lr_recipe) %>% 
+  add_model(xgb_spec)
+
+xgb_res <- 
+  xgb_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)
+  ) 
+
+xgb_res %>% collect_metrics(summarize = TRUE)
+
+
+xgb_pred <- 
+  xgb_res %>%
+  collect_predictions()
+
+xgb_auc <- 
+  xgb_res %>% 
+  collect_predictions(parameters = xgb_res) %>% 
+  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
+  mutate(model = "Xgboost")
+
+## KNN
+knn_spec <- 
+  nearest_neighbor(neighbors = 4) %>% # we can adjust the number of neighbors 
+  set_engine("kknn") %>% 
+  set_mode("classification")
+
+## Knn workflow
+knn_wflow <-
+  workflow() %>%
+  add_recipe(lr_recipe) %>% 
+  add_model(knn_spec)
+
+
+##KNN model
+knn_res <- 
+  knn_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)
+  ) 
+knn_res %>% collect_metrics(summarize = TRUE)
+
+knn_pred <- 
+  knn_res %>%
+  collect_predictions()
+
+knn_auc <- 
+  knn_res %>% 
+  collect_predictions(parameters = knn_res) %>% 
+  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
+  mutate(model = "KNN")
+
+
+#nnet_spec <-
+# mlp() %>%
+# set_mode("classification") %>% 
+# set_engine("keras", verbose = 0) 
+
+## ANN workflow:
+#nnet_wflow <-
+#  workflow() %>%
+#  add_recipe(lr_recipe) %>% 
+#  add_model(nnet_spec)
+
+#nnet_res <- 
+#  nnet_wflow %>% 
+#  fit_resamples(
+#    resamples = cv_folds, 
+#   metrics = metric_set(
+#     f_meas, 
+#     accuracy, kap,
+#     roc_auc, sens, spec),
+#   control = control_resamples(save_pred = TRUE)
+# ) 
+
+
+
+log_metrics <- 
+  log_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Logistic Regression") # add the name of the model to every row
+
+rf_metrics <- 
+  rf_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Random Forest")
+
+xgb_metrics <- 
+  xgb_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "XGBoost")
+
+knn_metrics <- 
+  knn_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Knn")
+
+# nnet_metrics <- 
+#   nnet_res %>% 
+#   collect_metrics(summarise = TRUE) %>%
+#   mutate(model = "Neural Net")
+
+# create dataframe with all models
+model_compare <- bind_rows(
+  log_metrics,
+  rf_metrics,
+  xgb_metrics,
+  knn_metrics,
+  # nnet_metrics
+) 
+
+# change data structure
+model_comp <- 
+  model_compare %>% 
+  select(model, .metric, mean, std_err) %>% 
+  pivot_wider(names_from = .metric, values_from = c(mean, std_err)) 
+
+# show mean F1-Score for every model
+model_comp %>% 
+  arrange(mean_f_meas) %>% 
+  mutate(model = fct_reorder(model, mean_f_meas)) %>% # order results
+  ggplot(aes(model, mean_f_meas, fill=model)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_brewer(palette = "Blues") +
+  geom_text(
+    size = 3,
+    aes(label = round(mean_f_meas, 2), y = mean_f_meas + 0.08),
+    vjust = 1
+  )
+
+
+## Model tuning
+
+rf_best_mod <- 
+  rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>% 
+  set_engine("ranger", num.threads = cores) %>% 
+  set_mode("classification")
+rf_best_workflow <- 
+  workflow() %>% 
+  add_model(rf_best_mod) %>% 
+  add_recipe(lr_recipe)
+
+cores <- parallel::detectCores()
+cores
+set.seed(345)
+rf_best_res <- 
+  rf_best_workflow %>% 
+  tune_grid(val_set,
+            grid = 25,
+            control = control_grid(save_pred = TRUE),
+            metrics = metric_set(roc_auc))
+
+rf_best <- 
+  rf_best_res %>% 
+  select_best(metric = "roc_auc")
+
+rf_best_res %>% 
+  collect_predictions()
+
+rf_auc_best <- 
+  rf_best_res %>% 
+  collect_predictions(parameters = rf_best) %>% 
+  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
+  mutate(model = "Tuned Random Forest")
+
+bind_rows(rf_auc,knn_auc,rf_auc_best) %>% 
+  ggplot(aes(x = 1 - specificity, y = sensitivity, col = model)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
+
+```
+
+
+## Model training and tuning
+
+The following candidate models will first be assessed.
+
+- Logistic Regression
+- Random Forest,
+- XGBoost (extreme gradient boosted trees),
+- K-nearest neighbor
+
+
+#### WORKFLOW
+
+```{r, echo=FALSE, warning=FALSE,message=FALSE}
+#source("Step4_Modeling.R")
+All_Models
+
+```
+
+
+### MODEL TUNING 
+
+Grid search algorithm was used to train multiple  models simultaneously. We’ll also save the validation set predictions (via the call to control_grid()) so that diagnostic information can be available after the model fit. The area under the ROC curve will be used to quantify how well the model performs across a continuum of event thresholds (recall that the event rate—the proportion of stays including children— is very low for these data).
+
+
+We will use a space-filling design to tune, with 25 candidate models:
+
+
+
+The random forest is uniformly better across event probability thresholds.
+
+
+
+### Best model Description
 Describe the resulting model and assess its expected accuracy, robustness, and possible shortcomings. Report on the interpretation of the models and any difficulties encountered.
 
 * Describe any characteristics of the current model that may be useful for the future
@@ -419,47 +735,9 @@ Describe the resulting model and assess its expected accuracy, robustness, and p
 * Describe the model’s behavior and interpretation
 * State conclusions regarding patterns in the data (if any); sometimes the model reveals important facts about the data without a separate assessment process (e.g., that the output or conclusion is duplicated in one of the inputs)
 
-## Assess Model
-The model should now be assessed to ensure that it meets the data mining success criteria and passes the desired test criteria. This is a purely technical assessment based on the outcome of the modeling tasks.
 
-### Model Assessment
-Summarize results of this task, list qualities of generated models (e.g., in terms of accuracy), and rank their quality in relation to each other.
+### Defining the best cut-point value
 
-* Evaluate results with respect to evaluation criteria
-* Test result according to a test strategy (e.g.: Train and Test, Cross-validation, bootstrapping, etc.)
-* Compare evaluation results and interpretation
-* Create ranking of results with respect to success and evaluation criteria
-* Select best models
-* Interpret results in business terms (as far as possible at this stage)
-* Get comments on models by domain or data experts
-* Check plausibility of model
-* Check effect on data mining goal
-* Check model against given knowledge base to see if the discovered information is novel and useful
-* Check reliability of result
-* Analyze potential for deployment of each result
-* If there is a verbal description of the generated model (e.g., via rules), assess the rules: Are they logical, are they feasible, are there too many or too few, do they offend common sense?
-* Assess results
-* Get insights into why a certain modeling technique and certain parameter settings lead to good/bad results
-
-“Lift Tables” and “Gain Tables” can be constructed to determine how well the model is predicting.
-
-### Revised Parameter Settings
-According to the model assessment, revise parameter settings and tune them for the next run in the Build Model task. Iterate model building and assessment until you find the best model.
-
-Adjust parameters to produce better models.
-
-# Evaluation
-Previous evaluation steps dealt with factors such as the accuracy and generality of the model. This step assesses the degree to which the model meets the business objectives, and seeks to determine if there is some business reason why this model is deficient. It compares results with the evaluation criteria defined at the start of the project.
-
-A good way of defining the total outputs of a data mining project is to use the equation:
-$$RESULTS = MODELS + FINDINGS$$
-
-In this equation, we are defining that the total output of the data mining project is not just the models (although they are, of course, important) but also the findings, which we define as anything (apart from the model) that is important in meeting the objectives of the business or important in leading to new questions, lines of approach, or side effects (e.g., data quality problems uncovered by the data mining exercise). Note: Although the model is directly connected to the business questions, the findings need not be related to any questions or objectives, as long as they are important to the initiator of the project.
-
-## Evaluate Results
-This step assesses the degree to which the model meets the business objectives, and seeks to determine if there is some business reason why this model is deficient. Another option is to test the model(s) on test applications in the real application, if time and budget constraints permit.
-
-Moreover, evaluation also assesses other generated data mining results. Data mining results cover models that are related to the original business objectives and all other findings. Some are related to the original business objectives while others might unveil additional challenges, information, or hints for future directions.
 
 ### Assessment of Data Mining Results w.r.t. Business Success Criteria
 Summarize assessment results in terms of business success criteria, including a final statement related to whether the project already meets the initial business objectives.
@@ -475,8 +753,6 @@ Summarize assessment results in terms of business success criteria, including a 
 * Determine if there are new business objectives to be addressed later in the project, or in new projects
 * State recommendations for future data mining projects
 
-### Approved Models
-After accessing models with respect to business success criteria, select and approve the generated models that meet the selected criteria.
 
 ## Review Process
 At this point, the resulting model appears to be satisfactory and appears to satisfy business needs. It is now appropriate to make a more thorough review of the data mining engagement in order to determine if there is any important factor or task that has somehow been overlooked. At this stage of the data mining exercise, the Process Review takes the form of a Quality Assurance Review.
