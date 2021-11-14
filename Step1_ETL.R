@@ -236,8 +236,6 @@ cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"mitr
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"aortic valve replacement", "avr")
 
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"thoraco/abdominal", "thoracoabdominal")
-
- 
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"myocardial infarction", "mi")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"acute mi", "mi")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"re/do", "redo")
@@ -249,9 +247,6 @@ cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"gast
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"90/", "")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"afibrialltion", "afib")
 cardiacSyndromes$DIAGNOSIS3 <- str_replace_all(cardiacSyndromes$DIAGNOSIS3,"afibuation", "afib")
-
-
-
 
 
 table<-table(cardiacSyndromes$DIAGNOSIS3)
@@ -336,8 +331,6 @@ procW$count <- sapply(strsplit(procW$x,'/'), uniqueN)
 proc<-data.frame(str_split_fixed(procW$x, "/", max(procW$count)))
 
 source("Recoding.R")
-
-
 
 microb<-read.csv("MICROBIOLOGYEVENTS.csv") %>% 
   select(-ROW_ID,-SUBJECT_ID)

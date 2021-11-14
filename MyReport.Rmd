@@ -16,6 +16,9 @@ output:
     toc: yes
     toc_depth: 2
     toc_float: yes
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{pgfplots}
 ---
 ```{r setup, include=FALSE}
 ## set output options
@@ -30,24 +33,19 @@ source("Global.R")
 
 ##  Introduction
 Cardiovascular diseases (CVDs), principally ischemic heart disease (IHD) and cardiac stroke,
-are the leading cause of global mortality. In addition to their increasing global prevalence, they are often associated with poor survival[@roth].
+are the leading cause of  mortality globally and are often associated with poor survival[@roth].
 
-Acute Coronary Syndrome (ACS) is a term given to a continuum of CVDs ranging from ST-segment elevation myocardial infarction (STEMI) to non–ST-segment elevation myocardial infarction (NSTEMI) and unstable angina. 
-Accurate estimation of risk for untoward outcomes after a suspected onset of an ACS may help clinicians chose the type and intensity of therapy. Such predictions may be helpful as patients predicted to be at higher risk may receive more aggressive surveillance and/or earlier treatment, while patients predicted to be at lower risk may be managed less aggressively.
+Acute Coronary Syndrome (ACS) is a term given to diverse presentations related to cardic myopathies of quick onset. 
+Accurate estimation of risk for untoward outcomes after a suspected onset of an ACS may help clinicians chose the type and intensity of therapy. For example, patients predicted to be at higher risk may receive more aggressive surveillance and/or treatment, while patients predicted to be at lower risk may be managed less aggressively.
 
 
 #### Problem statement
 
 The establishment of prognosis model for patients with suspected ACS is important in critical care medicine.Numerous risk-prediction models for differing outcomes exist for the different types of ACS. 
 
+These models however have some limitations. First, most models have been developed from large randomized clinical trial populations in which the generalizability to risk prediction in the average clinician's experience is questionable[@Eagle].Second, given the dynamic nature of the treatment environment, predicting future behavior while the treatment is underway may help the clinicians make decisions proactively.
 
-These models however have some limitations. First, most models have been developed from large randomized clinical trial populations in which the generalizability to risk prediction in the average clinician's experience is questionable[@Eagle].  
-
-Second, given the dynamic nature of the treatment environment, predicting future behavior while the treatment is underway may help the clinicians make decisions proactively.
-
-
-This project aimed  at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause mortality. The motivation was to determine the utility of machine learning at the population level using multiple linked ICU patients' datasets.
-
+This project aimed  at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause mortality using multiple linked ICU patients' datasets. Subsequently, the treatment pathway was used to explain the predicted outcome.
 
 
 ### Project Objectives
@@ -57,19 +55,17 @@ This project developed a tool for application in the decision-making environment
 1.  A binary classification model was developed. This model used:
 
 - Patient demographics 
-- Interventions within the golden hour (laboratory, medication, procedures and microbiology studies).
-
-The concept of the golden hour refers to the vital period by which a patient with a suspected cardiovascular event should be receiving definitive treatment to prevent death or irreparable damage to the heart.Although not set in stone, the chances to save a patient are usually high if substantive medical attention is given within an hour of the cardiac event[@johnson]. In this study the golden hour cut-off was 60 minutes after initial contact with the hospital. This included all interventions that were done prior to admission.
+- Interventions within the golden hour (laboratory, medication, procedures and microbiology studies).Although not set in stone, the chances for a patient to have good outcomes are usually high if substantive medical attention is given within an hour of the cardiac event[@johnson]. In this study the golden hour cut-off was 60 minutes after initial contact with the hospital. This included all interventions that were done prior to admission.
 
 2.  Process mining was  used to explain the outcome of the patient based on the care pathway followed. Two concepts were applied:
 
 * Process discovery -  Processes followed by the two classes will be described. 
 * Conformance checking - The care pathway followed by both patients will be checked for conformance  with the American Heart Association(AHA) guidelines for CPR and ECC [@americanheart]. To run the process mining the timestamped interventions  (laboratory, medication, procedures) were used.
 
-## Project Plan
+## Project plan
 
 #### Sources of Data and Knowledge
-
+    
 ##### MIMIC III Database
 
 MIMIC-III is a large, freely-available database comprising deidentified health-related data associated with 46,520  patients who stayed in critical care units of the Beth Israel Deaconess Medical Center between 2001 and 2012.  The database includes information such as demographics, vital sign measurements made at the bedside , laboratory test results, procedures, medications, caregiver notes, imaging reports, and mortality (including post-hospital discharge).
@@ -137,12 +133,6 @@ The following terms were used to identify Glycoprotein IIb/IIIa inhibitors's fro
 
 
 
-### Success Criteria
-
-The success of this project was to generate forward-looking, predictive insights to improve the management of the care pathway in patients suspected to have ACS by:
-
- - Successfully predicting the ICU mortality outcome of the patient with suspected ACS based on the patient demographics and the interventions given within the first one hour.
- - Identify patients in which undesirable events will likely be observed in the based on the interventions.
  
 
 ### Inventory of resources
@@ -176,10 +166,6 @@ It is also assumed that:
 
 
 
-
-###  Data Mining Goals
-A business goal states objectives in business terminology; a data mining goal states project objectives in technical terms. For example, the business goal might be, “Increase catalog sales to existing customers,” while a data mining goal might be, “Predict how many widgets a customer will buy, given their purchases over the past three years, relevant demographic information, and the price of the item.”
-
 ### Data Mining Goals
 1. Build a binary classification machine learning model to predict all-cause mortality of patients based on
 demographics and interventions within first hour of suspected ACS event.
@@ -187,6 +173,12 @@ demographics and interventions within first hour of suspected ACS event.
 ACLS care path.
 3. Assess and report any work flow variants, and differences between patients who died and those who
 survived.
+
+The success of this project was to generate forward-looking, predictive insights to improve the management of the care pathway in patients suspected to have ACS by:
+
+ - Successfully predicting the ICU mortality outcome of the patient with suspected ACS based on the patient demographics and the interventions given within the first one hour.
+ - Identify patients in which undesirable events will likely be observed in the based on the interventions.
+
 
 ### Data Mining Success Criteria
 After training the binary classifier,  evaluation measures will be used to assess the performance of the model. 
@@ -298,15 +290,7 @@ The total dataset was estimated to be more than 100GBs of data. The selected sub
 
 ### Attribute types and values
 
-And see Table \@ref(dtypes).
-
-```{r,dtypes, echo=FALSE }
-
-d<-data.frame(dlookr::diagnose(biodata))
-#d
-knitr::kable(d,
-             caption = "Attributes and the level of measurement")
-```
+And see Table \@Table 2.
              
 ### Assumptions/Limitations
 
@@ -361,27 +345,70 @@ Finally the chosen dataset factoring in 90% of the variance was factored in. Thi
 
 
 
-### Splitting of machine learning dataset
-These are the dataset(s) produced by the data preparation phase, used for modeling or for the major analysis work of the project.
-
 ## Construction of event logs
 
 
 # Modeling
 
-## Data splitting & resampling
+## Data splitting
+
+For the data splitting strategy, 25% of the hospital admissions were reserved to the test set. 
 
 
-For the data splitting strategy, 25% of the hospital admissions were reserved to the test set. Since the outcome variable(mortality) if slightly imbalances   stratified random sampling was used. 
+The k-fold cross-validation resampling method was used to create 5  different resamples of the training set which were further split into analysis and assessment sets, producing 5 different performance metrics that were then aggregated. In these resampled datasets, 20% of the  hospital admissions were allocated  to the validation set and 80% of the hospital stays to the training set. 
 
-The   k-fold cross-validation resampling method was used to create 10  different resamples of the training set (which were further split into analysis and assessment sets), producing 10 different performance metrics that were then aggregated.
+\begin{tikzpicture}[sibling distance=10em,
+  every node/.style = {shape=rectangle, rounded corners,
+    draw, align=center,
+    top color=white, bottom color=blue!20}]]
+  \node {All data= `r nrow(biodata)`}
+      child { node {Testing $\sim$`r round(nrow(biodata)*0.25,0)`} }
+      child { node {Training $\sim$ `r round(nrow(biodata)*0.75,0)`}
+      child { node {Sample 1 $\sim$ `r round(nrow(biodata)*0.15,0)`}
+      child { node {Training $\sim$`r round(nrow(biodata)*0.12,0)`}} 
+      child { node {Validation $\sim$`r round(nrow(biodata)*0.03,0)`} }}
+      child { node {.....}}
+      child { node {Sample 5 $\sim$ `r round(nrow(biodata)*0.15,0)`}
+      child { node {Training $\sim$`r round(nrow(biodata)*0.12,0)`}} 
+      child { node {Validation $\sim$`r round(nrow(biodata)*0.03,0)`} }}};
+\end{tikzpicture}
 
 
-Subsequently 20% of the  hospital admissions were allocated  to the validation set and 80% of the hospital stays to the training set. 
+## Model building and tuning
+
+### Performance metric and cut-off analysis
+
+In this analysis the F-Beta score was used to identify the model with the highest performance with a score  1.This was meant to:
+
+Increase Precision is a metric that calculates the percentage of correct predictions for the positive class.
+
+Recall calculates the percentage of correct predictions for the positive class out of all positive predictions that could be made. 
+
+The selected Beta score of 1 was meant to maximize precision will minimize the false-positive errors, whereas maximizing recall will minimize the false-negative errors.
+
+Finally all the performance metrics of this model were described. 
+
+#### Candidate models
+
+The following candidate models will first be assessed.
+
+- Logistic Regression
+- Random Forest,
+- XGBoost (extreme gradient boosted trees),
+- K-nearest neighbor
+
+#### Model building and tuning
+
+Grid search algorithm was used to train multiple  models simultaneously. We’ll also save the validation set predictions (via the call to control_grid()) so that diagnostic information can be available after the model fit. The area under the ROC curve will be used to quantify how well the model performs across a continuum of event thresholds (recall that the event rate—the proportion of stays including children— is very low for these data).
+
+We will use a space-filling design to tune, with 25 candidate models:
+The random forest is uniformly better across event probability thresholds.
+
+The combination that provides the best performance is the one that you use for your final model. This method is simple to use. You can find the best combination of the values that you provided, and you can run each of the experiments in parallel. However, it's also computationally expensive because so many models are being built. If a hyperparameter isn't important, you might explore different possibilities unnecessarily.
 
 
 
-```{r, echo=FALSE,warning=FALSE,message=FALSE}
+```{r, echo=FALSE,warning=FALSE,message=FALSE, results='hide'}
 
 data2$EXPIRE_FLAG<-as.factor(data2$EXPIRE_FLAG) 
 data2<-data2%>% 
@@ -408,8 +435,6 @@ val_set <- validation_split(data_training,
 val_set
 
 
-
-
 lr_recipe <- 
   recipe(EXPIRE_FLAG ~ ., data = data_training) %>% 
   step_dummy(all_nominal(), -all_outcomes()) %>% 
@@ -417,9 +442,7 @@ lr_recipe <-
   step_normalize(all_predictors()) %>%
   step_corr(all_predictors(), threshold = 0.7, method = "spearman")
 
-
 ## CV folds:
-
 cv_folds <-
   vfold_cv(data_training, 
            v = 5, 
@@ -691,103 +714,8 @@ bind_rows(rf_auc,knn_auc,rf_auc_best) %>%
 
 ```
 
-
-## Model training and tuning
-
-The following candidate models will first be assessed.
-
-- Logistic Regression
-- Random Forest,
-- XGBoost (extreme gradient boosted trees),
-- K-nearest neighbor
-
-
-#### WORKFLOW
-
-```{r, echo=FALSE, warning=FALSE,message=FALSE}
-#source("Step4_Modeling.R")
-All_Models
-
-```
-
-
-### MODEL TUNING 
-
-Grid search algorithm was used to train multiple  models simultaneously. We’ll also save the validation set predictions (via the call to control_grid()) so that diagnostic information can be available after the model fit. The area under the ROC curve will be used to quantify how well the model performs across a continuum of event thresholds (recall that the event rate—the proportion of stays including children— is very low for these data).
-
-
-We will use a space-filling design to tune, with 25 candidate models:
-
-
-
-The random forest is uniformly better across event probability thresholds.
-
-
-
 ### Best model Description
-Describe the resulting model and assess its expected accuracy, robustness, and possible shortcomings. Report on the interpretation of the models and any difficulties encountered.
 
-* Describe any characteristics of the current model that may be useful for the future
-* Record parameter settings used to produce the model
-* Give a detailed description of the model and any special features
-* For rule-based models, list the rules produced, plus any assessment of per-rule or overall model accuracy and coverage
-* For opaque models, list any technical information about the model (such as neural network topology) and any behavioral descriptions produced by the modeling process (such as accuracy or sensitivity)
-* Describe the model’s behavior and interpretation
-* State conclusions regarding patterns in the data (if any); sometimes the model reveals important facts about the data without a separate assessment process (e.g., that the output or conclusion is duplicated in one of the inputs)
-
-
-### Defining the best cut-point value
-
-
-### Assessment of Data Mining Results w.r.t. Business Success Criteria
-Summarize assessment results in terms of business success criteria, including a final statement related to whether the project already meets the initial business objectives.
-
-* Understand the data mining results
-* Interpret the results in terms of the application
-* Check effect on for data mining goal
-* Check the data mining result against the given knowledge base to see if the discovered information is novel and useful
-* Evaluate and assess results with respect to business success criteria (i.e., has the project achieved the original Business Objectives)
-* Compare evaluation results and interpretation
-* Rank results with respect to business success criteria
-* Check effect of result on initial application goal
-* Determine if there are new business objectives to be addressed later in the project, or in new projects
-* State recommendations for future data mining projects
-
-
-## Review Process
-At this point, the resulting model appears to be satisfactory and appears to satisfy business needs. It is now appropriate to make a more thorough review of the data mining engagement in order to determine if there is any important factor or task that has somehow been overlooked. At this stage of the data mining exercise, the Process Review takes the form of a Quality Assurance Review.
-
-### Review of Process
-Summarize the process review and list activities that have been missed and/or should be repeated.
-
-* Provide an overview of the data mining process used
-* Analyze the data mining process. For each stage of the process ask:
-    + Was it necessary?
-    + Was it executed optimally?
-    + In what ways could it be improved?
-* Identify failures
-* Identify misleading steps
-* Identify possible alternative actions and/or unexpected paths in the process
-* Review data mining results with respect to business success criteria
-
-## Determine Next Steps
-Based on the assessment results and the process review, the project team decides how to proceed. Decisions to be made include whether to finish this project and move on to deployment, to initiate further iterations, or to set up new data mining projects.
-
-### List of Possible Actions
-List possible further actions along with the reasons for and against each option.
-
-* Analyze the potential for deployment of each result
-* Estimate potential for improvement of current process
-* Check remaining resources to determine if they allow additional process iterations (or whether additional resources can be made available)
-* Recommend alternative continuations
-* Refine process plan
-
-### Decision
-Describe the decisions made, along with the rationale for them.
-
-* Rank the possible actions
-* Select one of the possible actions
-* Document reasons for the choice
 
 # Deployment
 
@@ -867,7 +795,19 @@ data <- tbl(con, "ADMISSIONS")
 
 ```
 
+### Data attibutes and levels of measurements
 
+```{r,dtypes, echo=FALSE }
+
+d<-data.frame(dlookr::diagnose(biodata)) %>% 
+  select(-missing_count)
+d <- d[!grepl("X|SUBJECT_ID|HADM_ID|ADMITTIME|DISCHTIME|DEATHTIME|DISCHARGE_LOCATION|EDREGTIME|EDOUTTIME|
+              DIAGNOSIS|HOSPITAL_EXPIRE_FLAG|HAS_CHARTEVENTS_DATA|DOB|LOS2|Period|endGoldenHour|nAdmissions|
+              deadBefore|DIAGNOSIS2|DIAGNOSIS", d$variables),]
+#d
+knitr::kable(d,
+             caption = "Attributes and the level of measurement")
+```
 
 
 # References

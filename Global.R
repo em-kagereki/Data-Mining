@@ -15,6 +15,7 @@ library(tm)
 library(tidytext)
 library(data.table)
 library(wordcloud2) 
+library(ggthemes) # Load
 
 library(knitr)
 library(broom)
@@ -109,3 +110,6 @@ subset<- c(medList, P2y12,HMGCoA,ACE,betaBlockers,glycoproteinInhibitors)
 
 
 # git add . && git commit -am "Report" && git push 
+
+# https://juliasilge.com/resume/
+# Check at the bottom - blog down.

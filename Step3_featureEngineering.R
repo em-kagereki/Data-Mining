@@ -45,6 +45,7 @@ data2<-data2%>%
 data2<-merge(x=data2,y=lab, by="HADM_ID", all=TRUE)%>%
   replace(is.na(.), 0)
 
+
 #data<-data2
 #index = createDataPartition(data$HADM_ID, p = 0.70, list = FALSE)
 #train = data[index, ]

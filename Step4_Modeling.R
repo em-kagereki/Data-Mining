@@ -5,7 +5,7 @@
 
 # https://www.tidymodels.org/start/case-study/
 
-setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4")
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 
 source("Step3_featureEngineering.R")
 data2$EXPIRE_FLAG<-as.factor(data2$EXPIRE_FLAG) 
@@ -271,7 +271,9 @@ model_comp %>%
     size = 3,
     aes(label = round(mean_f_meas, 2), y = mean_f_meas + 0.08),
     vjust = 1
-  )
+  )+
+  #scale_color_viridis_d(option = "plasma", end = .6)+ 
+  theme_economist() 
 
 
 ## Model tuning
@@ -280,6 +282,7 @@ rf_best_mod <-
   rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>% 
   set_engine("ranger", num.threads = cores) %>% 
   set_mode("classification")
+
 rf_best_workflow <- 
   workflow() %>% 
   add_model(rf_best_mod) %>% 
@@ -299,8 +302,10 @@ rf_best <-
   rf_best_res %>% 
   select_best(metric = "roc_auc")
 
+## By calling rf_best, we are collecting the parametres for the best model
+
 rf_best_res %>% 
-  collect_predictions()
+  collect_predictions() 
 
 rf_auc_best <- 
   rf_best_res %>% 
@@ -308,9 +313,43 @@ rf_auc_best <-
   roc_curve(EXPIRE_FLAG, .pred_0) %>% 
   mutate(model = "Tuned Random Forest")
 
-bind_rows(rf_auc,knn_auc,rf_auc_best) %>% 
+## The model with the best estimat
+
+bind_rows(rf_auc,knn_auc,rf_auc_best,log_auc) %>% 
   ggplot(aes(x = 1 - specificity, y = sensitivity, col = model)) + 
   geom_path(lwd = 1.5, alpha = 0.8) +
   geom_abline(lty = 3) + 
   coord_equal() + 
-  scale_color_viridis_d(option = "plasma", end = .6)
+  scale_color_viridis_d(option = "plasma", end = .6)+ 
+  theme_economist() 
+ # scale_color_economist()
+
+
+
+## Update the model
+
+last_rf_mod <- 
+  rand_forest(mtry = 4, min_n = 29, trees = 1000) %>% 
+  set_engine("ranger", num.threads = cores, importance = "impurity") %>% 
+  set_mode("classification")
+
+last_rf_workflow <- 
+  rf_best_workflow %>% 
+  update_model(last_rf_mod)
+
+last_rf_fit <- 
+  last_rf_workflow %>% 
+  last_fit(splits)
+
+last_rf_fit
+
+last_rf_fit %>% 
+  collect_metrics()
+
+
+last_rf_fit %>% 
+  pluck(".workflow", 1) %>%   
+  extract_fit_parsnip() %>% 
+  vip(num_features = 20)
+# THreshold of the F1
+#https://arxiv.org/abs/1402.1892

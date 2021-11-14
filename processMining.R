@@ -51,8 +51,21 @@ example_log_4 <-medication2 %>%
     resource_id = "resource"
   )
 
+medicationComplete$activity_instance <- seq.int(nrow(medicationComplete)) 
+example_log_5 <-medicationComplete %>%
+  mutate(resource = NA) %>%
+  filter(!is.na(timestamp)) %>%
+  eventlog(
+    case_id = "case_id",
+    activity_id = "activity",
+    activity_instance_id = "activity_instance",
+    lifecycle_id = "status",
+    timestamp = "timestamp",
+    resource_id = "resource"
+  )
+
 ## Map the process
-example_log<-example_log_4 %>%
+example_log<-example_log_5 %>%
   process_map()
 
 library(pm4py)

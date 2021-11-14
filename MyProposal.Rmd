@@ -284,7 +284,6 @@ Example 2 – Using hypothesis testing
 Example 3 – Using information gain for variable selection
 
 ```{r}
-library(FSelector)
 
 
 ```
@@ -570,7 +569,6 @@ medication<-tbl(con, "PRESCRIPTIONS")  %>%
 
 ## Write the flat files:
 ##
-
 # Classification:
 write.csv(cardiacSyndromes,"cardiacSyndromes.csv")
 write.csv(servicesWide,"servicesWide.csv")
@@ -591,9 +589,6 @@ write.csv(allLAbs, "logLab.csv")
 
 
 ```
-
-
-
 
 
 # References

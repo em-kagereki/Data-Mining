@@ -2,12 +2,16 @@
 source("Global.R")
 pt <-read.csv("PATIENTS.csv")
 biodata <-read.csv("cardiacSyndromes.csv")
-service <- read.csv("serviceGroup.csv")
-lab <- read.csv("labGroup.csv")
-med <- read.csv("mediGroup.csv")
-microb <- read.csv("microGroup.csv")
-proc <- read.csv("procGroup.csv")
-
+service <- read.csv("serviceGroup.csv") %>% 
+  select(where(is.numeric) ,-X)
+lab <- read.csv("labGroup.csv") %>% 
+  select(where(is.numeric),-X)
+med <- read.csv("mediGroup.csv") %>% 
+  select(where(is.numeric),-X)
+microb <- read.csv("microGroup.csv") %>% 
+  select(where(is.numeric),-X)
+proc <- read.csv("procGroup.csv") %>% 
+  select(where(is.numeric),-X)
 
 data <-biodata %>% 
   mutate_all(na_if,"") %>% 
