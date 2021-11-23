@@ -1,4 +1,4 @@
-#setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4")
+#setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 source("Global.R")
 pt <-read.csv("PATIENTS.csv")
 biodata <-read.csv("cardiacSyndromes.csv")
@@ -36,7 +36,9 @@ data$ETHNICITY2<-ifelse(grepl("PORTUGUESE",data$ETHNICITY2),"CAUCASIAN",data$ETH
 data$ETHNICITY2<-ifelse(grepl("WHITE",data$ETHNICITY2),"CAUCASIAN",data$ETHNICITY2)
 data$ETHNICITY2<-ifelse(grepl("BLACK",data$ETHNICITY2),"BLACK",data$ETHNICITY2)
 data$ETHNICITY2<-ifelse(grepl("MULTI RACE ETHNICITY",data$ETHNICITY2),"OTHER",data$ETHNICITY2)
-data$ETHNICITY2<-ifelse(grepl("UNABLE TO OBTAIN",data$ETHNICITY2),"UNKNOWN",data$ETHNICITY2)
+data$ETHNICITY2<-ifelse(grepl("UNABLE TO  cannot open the connection
+In addition: Warning message:
+ OBTAIN",data$ETHNICITY2),"UNKNOWN",data$ETHNICITY2)
 
 
 theme_gtsummary_journal(journal = "jama")
@@ -78,18 +80,36 @@ dataPlot <-biodata %>%
 Dead<-dataPlot %>% 
   filter(EXPIRE_FLAG==0) %>% 
   count(year, sort = TRUE) %>% 
-  mutate(status = "Dead")
+  mutate(status = "Survived")
 
 survive<-dataPlot %>% 
   filter(EXPIRE_FLAG== 1) %>% 
   count(year, sort = TRUE) %>% 
-  mutate(status = "Survived")
+  mutate(status = "Dead")
 
-dataPlot<-rbind(Dead,survive)
+dataPlot1<-rbind(Dead,survive)
 
-dataPlot<-ggplot(dataPlot, aes(x = year, y = n)) + 
+dataPlot<-ggplot(dataPlot1, aes(x = year, y = n)) + 
   geom_line(aes(color = status), size = 1) +
-  scale_color_manual(values = c("#00AFBB", "#E7B800")) +
-  theme_minimal()
+  #scale_color_manual(values = c("#00AFBB", "#E7B800")) +
+  theme_economist() +
+  ggtitle("From 2100 to 2190 (Full Data Set)") +
+  xlab("Year(shifted)") + ylab("Number of admissions")
+
+
+
+p2 <- dataPlot1 %>%
+  #filter(year<2130) %>%
+  ggplot(aes(year, n)) +
+  #geom_line(color = palette_light()[[1]], alpha = 0.5) +
+  geom_line(aes(color = status), size = 1) +
+  #geom_point(color = palette_light()[[1]]) +
+  #geom_smooth(method = "loess", span = 0.2, se = FALSE) +
+  #theme_economist() +
+  theme_wsj()+
+  labs(
+    title = "2100 to 2130 (Zoomed In To Show Cycle)",
+    caption = "Number of admissions"
+  )
 
 

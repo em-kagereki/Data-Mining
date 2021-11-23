@@ -33,6 +33,11 @@ admin<-merge(x = admin, y = pt, by = "SUBJECT_ID", all.x = TRUE) %>%
   mutate(year = year(ADMITTIME)) %>% 
   mutate(hour = hour(ADMITTIME))
 
+#patientOutcome<-admin %>% 
+ # select(SUBJECT_ID,HADM_ID,EXPIRE_FLAG) %>% 
+  #unite(case_id, SUBJECT_ID,HADM_ID, sep = "-", remove = FALSE) 
+#write.csv(patientOutcome,"patientOutcome.csv")
+
 deadBefore<-admin %>% 
   mutate(deadBefore = as.numeric(DEATHTIME-endGoldenHour)) %>% 
   mutate(deadBefore = ifelse(HOSPITAL_EXPIRE_FLAG==1, 0, deadBefore)) %>%  ## Remove all the patients who died before the cut-off

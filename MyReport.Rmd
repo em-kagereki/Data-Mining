@@ -357,45 +357,65 @@ For the data splitting strategy, 25% of the hospital admissions were reserved to
 
 The k-fold cross-validation resampling method was used to create 5  different resamples of the training set which were further split into analysis and assessment sets, producing 5 different performance metrics that were then aggregated. In these resampled datasets, 20% of the  hospital admissions were allocated  to the validation set and 80% of the hospital stays to the training set. 
 
+\begin{figure}
+\centering
 \begin{tikzpicture}[sibling distance=10em,
   every node/.style = {shape=rectangle, rounded corners,
     draw, align=center,
     top color=white, bottom color=blue!20}]]
   \node {All data= `r nrow(biodata)`}
-      child { node {Testing $\sim$`r round(nrow(biodata)*0.25,0)`} }
-      child { node {Training $\sim$ `r round(nrow(biodata)*0.75,0)`}
-      child { node {Sample 1 $\sim$ `r round(nrow(biodata)*0.15,0)`}
-      child { node {Training $\sim$`r round(nrow(biodata)*0.12,0)`}} 
-      child { node {Validation $\sim$`r round(nrow(biodata)*0.03,0)`} }}
+      child { node {Testing $\sim$`r round(nrow(biodata)*0.2,0)`} }
+      child { node {Training $\sim$ `r round(nrow(biodata)*0.8,0)`}
+      child { node {Sample 1 $\sim$ `r round(nrow(biodata)*0.16,0)`}
+      child { node {Training $\sim$`r round(nrow(biodata)*0.128,0)`}} 
+      child { node {Validation $\sim$`r round(nrow(biodata)*0.032,0)`} }}
       child { node {.....}}
-      child { node {Sample 5 $\sim$ `r round(nrow(biodata)*0.15,0)`}
-      child { node {Training $\sim$`r round(nrow(biodata)*0.12,0)`}} 
-      child { node {Validation $\sim$`r round(nrow(biodata)*0.03,0)`} }}};
+      child { node {Sample 5 $\sim$ `r round(nrow(biodata)*0.16,0)`}
+      child { node {Training $\sim$`r round(nrow(biodata)*0.128,0)`}} 
+      child { node {Validation $\sim$`r round(nrow(biodata)*0.032,0)`} }}};
 \end{tikzpicture}
-
+\caption{Data splitting algorithm} \label{fig:Data splitting algorithm}
+\end{figure}
 
 ## Model building and tuning
 
-### Performance metric and cut-off analysis
+### Performance metric 
 
-In this analysis the F-Beta score was used to identify the model with the highest performance with a score  1.This was meant to:
+In this analysis the Fbeta measure  was used to identify the model with the highest performance performance. Beta was set at 2, to give less weight on the precision and more weight on the recall. 
 
-Increase Precision is a metric that calculates the percentage of correct predictions for the positive class.
 
-Recall calculates the percentage of correct predictions for the positive class out of all positive predictions that could be made. 
 
-The selected Beta score of 1 was meant to maximize precision will minimize the false-positive errors, whereas maximizing recall will minimize the false-negative errors.
 
-Finally all the performance metrics of this model were described. 
+
 
 #### Candidate models
 
-The following candidate models will first be assessed.
+Candidate models were selected from the candidate classification models in a multi step way:
 
-- Logistic Regression
-- Random Forest,
-- XGBoost (extreme gradient boosted trees),
-- K-nearest neighbor
+Step 1: A representative model was chosen from the broad categories of classification models:
+
+1. Linear models:Regression model.
+
+2. Tree based models: Random forest.
+
+3. Kernel based model: KNN.
+
+4. Quadratic classification model
+
+4. Neural networks: This was not done due to computational limitations
+
+Results were as below:
+
+Step 2: Other models in the Linear classification models were intoduced: 
+
+Generative models: Naive Bayes, LDA
+
+Discriminative: logistic regression, SVM
+
+These were compare with the earlier categories to pick the best model.
+
+
+Step 3: Tuning of the best two prformers
 
 #### Model building and tuning
 

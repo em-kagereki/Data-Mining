@@ -52,6 +52,10 @@ library(keras)
 #remotes::install_github("davidsjoberg/ggsankey")
 library(ggsankey)
 
+library(MASS)
+library(tidymodels)
+library(discrim)
+
 #library(FSelector)
 #library(FSelectorRcpp)
 
@@ -109,7 +113,7 @@ subset<- c(medList, P2y12,HMGCoA,ACE,betaBlockers,glycoproteinInhibitors)
 
 
 
-# git add . && git commit -am "Report" && git push 
+# git add . && git commit -am "Split" && git push 
 
 # https://juliasilge.com/resume/
 # Check at the bottom - blog down.

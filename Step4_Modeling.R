@@ -11,12 +11,13 @@ source("Step3_featureEngineering.R")
 data2$EXPIRE_FLAG<-as.factor(data2$EXPIRE_FLAG) 
 data2<-data2%>% 
   select(-FreqDISCHARGE_LOCATION)
-splits<- initial_split(data2%>% select(-HADM_ID),
-                       prop =3/4,
-                       strata = EXPIRE_FLAG)
+data2$ADMITTIME <-ymd_hms(data2$ADMITTIME)
 
-data_training <- training(splits)
-data_test  <- testing(splits)
+splits_data<- initial_split(data2%>% select(-HADM_ID),
+                       prop =8/10)
+
+data_training <- training(splits_data)
+data_test  <- testing(splits_data)
 
 data_training %>% 
   count(EXPIRE_FLAG) %>% 
@@ -30,17 +31,16 @@ data_test  %>%
 val_set <- validation_split(data_training, 
                             strata = EXPIRE_FLAG, 
                             prop = 0.80)
-val_set
-
-
-
 
 lr_recipe <- 
   recipe(EXPIRE_FLAG ~ ., data = data_training) %>% 
-  step_dummy(all_nominal(), -all_outcomes()) %>% 
   step_zv(all_predictors()) %>% 
+  step_date(ADMITTIME) %>% 
+  step_rm(ADMITTIME) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
   step_normalize(all_predictors()) %>%
-  step_corr(all_predictors(), threshold = 0.7, method = "spearman")
+  step_corr(all_predictors(), threshold = 0.7, method = "spearman") %>% 
+  step_pca(all_numeric())
 
 
 ## CV folds:
@@ -76,10 +76,6 @@ log_res <-
   ) 
 log_res %>%  collect_metrics(summarize = FALSE)
 
-log_pred <- 
-  log_res %>%
-  collect_predictions()
-
 log_auc <- 
   log_res %>% 
   collect_predictions(parameters = log_res) %>% 
@@ -112,17 +108,6 @@ rf_res <-
 
 rf_res %>%  collect_metrics(summarize = TRUE)
 
-
-rf_pred <- 
-  rf_res %>%
-  collect_predictions()
-
-rf_auc <- 
-  rf_res %>% 
-  collect_predictions(parameters = rf_res) %>% 
-  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
-  mutate(model = "Random forest")
-
 # Xgboost
 xgb_spec <- 
   boost_tree() %>% 
@@ -148,16 +133,6 @@ xgb_res <-
 xgb_res %>% collect_metrics(summarize = TRUE)
 
 
-xgb_pred <- 
-  xgb_res %>%
-  collect_predictions()
-
-xgb_auc <- 
-  xgb_res %>% 
-  collect_predictions(parameters = xgb_res) %>% 
-  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
-  mutate(model = "Xgboost")
-
 ## KNN
 knn_spec <- 
   nearest_neighbor(neighbors = 4) %>% # we can adjust the number of neighbors 
@@ -180,19 +155,8 @@ knn_res <-
       f_meas, 
       accuracy, kap,
       roc_auc, sens, spec),
-    control = control_resamples(save_pred = TRUE)
-  ) 
+    control = control_resamples(save_pred = TRUE)) 
 knn_res %>% collect_metrics(summarize = TRUE)
-
-knn_pred <- 
-  knn_res %>%
-  collect_predictions()
-
-knn_auc <- 
-  knn_res %>% 
-  collect_predictions(parameters = knn_res) %>% 
-  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
-  mutate(model = "KNN")
 
 
 #nnet_spec <-
@@ -216,7 +180,6 @@ knn_auc <-
 #     roc_auc, sens, spec),
 #   control = control_resamples(save_pred = TRUE)
 # ) 
-
 
 
 log_metrics <- 
@@ -272,14 +235,19 @@ model_comp %>%
     aes(label = round(mean_f_meas, 2), y = mean_f_meas + 0.08),
     vjust = 1
   )+
-  #scale_color_viridis_d(option = "plasma", end = .6)+ 
   theme_economist() 
 
 
 ## Model tuning
 
+
+
+
+set.seed(345)
+cores <- parallel::detectCores()
+
 rf_best_mod <- 
-  rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>% 
+  rand_forest(mtry = tune(), min_n = tune(), trees = 128) %>% 
   set_engine("ranger", num.threads = cores) %>% 
   set_mode("classification")
 
@@ -288,63 +256,94 @@ rf_best_workflow <-
   add_model(rf_best_mod) %>% 
   add_recipe(lr_recipe)
 
-cores <- parallel::detectCores()
-cores
-set.seed(345)
 rf_best_res <- 
   rf_best_workflow %>% 
   tune_grid(val_set,
             grid = 25,
             control = control_grid(save_pred = TRUE),
-            metrics = metric_set(roc_auc))
+            metrics = metric_set(f_meas))
 
 rf_best <- 
   rf_best_res %>% 
-  select_best(metric = "roc_auc")
+  select_best(metric = "f_meas")
+
+
+rf_best_metrics <- 
+  rf_best_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Tuned Random Forest")
+
 
 ## By calling rf_best, we are collecting the parametres for the best model
 
 rf_best_res %>% 
   collect_predictions() 
 
-rf_auc_best <- 
-  rf_best_res %>% 
-  collect_predictions(parameters = rf_best) %>% 
-  roc_curve(EXPIRE_FLAG, .pred_0) %>% 
-  mutate(model = "Tuned Random Forest")
+
+mean<-mean(rf_best_metrics$mean)
+
+model_comp<-model_comp %>% 
+  select(model,mean_f_meas) %>% 
+  add_row(model = "Tuned Random Forest", mean_f_meas = mean)
+
+model_comp %>% 
+  arrange(mean_f_meas) %>% 
+  mutate(model = fct_reorder(model, mean_f_meas)) %>% # order results
+  ggplot(aes(model, mean_f_meas, fill=model)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_brewer(palette = "Blues") +
+  geom_text(
+    size = 3,
+    aes(label = round(mean_f_meas, 2), y = mean_f_meas + 0.08),
+    vjust = 1
+  )+
+  #scale_color_viridis_d(option = "plasma", end = .6)+ 
+  theme_economist() 
+
 
 ## The model with the best estimat
-
-bind_rows(rf_auc,knn_auc,rf_auc_best,log_auc) %>% 
-  ggplot(aes(x = 1 - specificity, y = sensitivity, col = model)) + 
-  geom_path(lwd = 1.5, alpha = 0.8) +
-  geom_abline(lty = 3) + 
-  coord_equal() + 
-  scale_color_viridis_d(option = "plasma", end = .6)+ 
-  theme_economist() 
- # scale_color_economist()
-
-
-
-## Update the model
+## We have to repeat this code to get the new metrics
 
 last_rf_mod <- 
-  rand_forest(mtry = 4, min_n = 29, trees = 1000) %>% 
+  rand_forest(mtry = rf_best$mtry, min_n = rf_best$min_n, trees = 128) %>% 
   set_engine("ranger", num.threads = cores, importance = "impurity") %>% 
   set_mode("classification")
 
 last_rf_workflow <- 
-  rf_best_workflow %>% 
+  rf_wflow %>% 
   update_model(last_rf_mod)
+
 
 last_rf_fit <- 
   last_rf_workflow %>% 
-  last_fit(splits)
+  last_fit(split=splits_data)
 
-last_rf_fit
+Predictions<-last_rf_fit %>% 
+  collect_predictions()
+
 
 last_rf_fit %>% 
   collect_metrics()
+
+
+
+Predictions$EXPIRE_FLAG<-as.numeric(Predictions$EXPIRE_FLAG)
+Predictions$.pred_class<-as.numeric(Predictions$.pred_class)
+
+library(cutpointr)
+
+
+cp <- cutpointr(Predictions, .pred_class, EXPIRE_FLAG, 
+                method = maximize_metric, metric = sum_sens_spec)
+
+F1Score <- cutpointr(Predictions, .pred_class, EXPIRE_FLAG, 
+                method = maximize_metric, metric = F1_score)
+
+summary(cp)
+
+plot(cp)
+#opt_cut_b <- cutpointr(Predictions, .pred_class, EXPIRE_FLAG, boot_runs = 1000)
 
 
 last_rf_fit %>% 

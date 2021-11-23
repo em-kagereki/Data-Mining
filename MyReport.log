@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.11.13)  13 NOV 2021 23:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.11.13)  19 NOV 2021 17:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -999,8 +999,7 @@ dftex.def
 File: l3backend-pdftex.def 2021-10-18 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count341
 \l__pdf_internal_box=\box86
-)
-No file MyReport.aux.
+) (./MyReport.aux)
 \openout1 = `MyReport.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 163.
@@ -1148,18 +1147,26 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-msb.cf
 g
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+) (./MyReport.toc
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 2.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 2.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 2.
 )
 \tf@toc=\write5
 \openout5 = `MyReport.toc'.
 
+[1
+
+{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.m
+ap}]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
 24.
 (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [1
-
-{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.m
-ap}]
+) [2]
 Underfull \hbox (badness 5563) in paragraph at lines 339--340
 []\T1/lmr/m/it/10 (+20) ``stemi,''``acute coro-nary syn-drome,''``angina,''``ta
 chycardia,''``aortic aneurysm,''``pericardi,''``ortic dis-
@@ -1171,7 +1178,7 @@ Underfull \hbox (badness 2671) in paragraph at lines 339--340
 thy,''``heart fail-ure,''``mitral valve dis-ease,''``mitral
  []
 
-[2]
+
 Overfull \hbox (25.68675pt too wide) in paragraph at lines 372--374
 []\T1/lmr/m/it/10 (-20) ``acebutolol,''``atenolol,''``betaxolol,''``bisoprolol,
 ''``carteolol,''``carvedilol,''``labetalol,''``metoprolol,''``nadolol,''``nebiv
@@ -1188,51 +1195,87 @@ ol,''``pravastatin,''``rosuvastatin,''``simcor,''``simvastatin,''``simvastatin,
 
  []
 
-[3]
-
-Package longtable Warning: Column widths have changed
-(longtable)                in table 1 on input line 529.
-
-[4]
-<MyReport_files/figure-latex/unnamed-chunk-4-1.pdf, id=91, 469.755pt x 325.215p
-t>
+[3] [4] [5]
+<MyReport_files/figure-latex/unnamed-chunk-4-1.pdf, id=141, 469.755pt x 325.215
+pt>
 File: MyReport_files/figure-latex/unnamed-chunk-4-1.pdf Graphic file (type pdf)
 
 <use MyReport_files/figure-latex/unnamed-chunk-4-1.pdf>
 Package pdftex.def Info: MyReport_files/figure-latex/unnamed-chunk-4-1.pdf  use
 d on input line 668.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[5] [6 <./MyReport_files/figure-latex/unnamed-chunk-4-1.pdf>]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 787.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 787.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 787.
-
+[6 <./MyReport_files/figure-latex/unnamed-chunk-4-1.pdf>]
 Underfull \hbox (badness 10000) in paragraph at lines 787--788
 [][]$\T1/lmr/m/n/10 (+20) https : / / towardsdatascience . com / dimensionality
  -[] reduction -[] for -[] data -[] visualization -[] pca -[] vs -[] tsne -[] v
 s -[] umap -[]
  []
 
+[7]
 Missing character: There is no ] in font nullfont!
+[8pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.889 
+      ]
+<MyReport_files/figure-latex/unnamed-chunk-6-1.pdf, id=196, 469.755pt x 325.215
+pt>
+File: MyReport_files/figure-latex/unnamed-chunk-6-1.pdf Graphic file (type pdf)
 
-! LaTeX Error: \caption outside float.
+<use MyReport_files/figure-latex/unnamed-chunk-6-1.pdf>
+Package pdftex.def Info: MyReport_files/figure-latex/unnamed-chunk-6-1.pdf  use
+d on input line 898.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+<MyReport_files/figure-latex/unnamed-chunk-6-2.pdf, id=197, 469.755pt x 325.215
+pt>
+File: MyReport_files/figure-latex/unnamed-chunk-6-2.pdf Graphic file (type pdf)
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.829 \caption
-              {M1} \label{fig:M1} 
+<use MyReport_files/figure-latex/unnamed-chunk-6-2.pdf>
+Package pdftex.def Info: MyReport_files/figure-latex/unnamed-chunk-6-2.pdf  use
+d on input line 899.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 898--900
+[][]
+ []
+
+[9 <./MyReport_files/figure-latex/unnamed-chunk-6-1.pdf>] [10 <./MyReport_files
+/figure-latex/unnamed-chunk-6-2.pdf>] [11]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
+081.
+(c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [12pdfTeX warning (ext4): destination with the same identifier (name{table.2}
+) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1159 
+       ] [13] (./MyReport.aux) ) 
 Here is how much of TeX's memory you used:
- 35485 strings out of 480331
- 814510 string characters out of 5896458
- 1229759 words of memory out of 5000000
- 52487 multiletter control sequences out of 15000+600000
- 459910 words of font info for 140 fonts, out of 8000000 for 9000
+ 35704 strings out of 480331
+ 818729 string characters out of 5896458
+ 1235759 words of memory out of 5000000
+ 52620 multiletter control sequences out of 15000+600000
+ 460608 words of font info for 145 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 84i,12n,80p,1005b,1243s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 84i,14n,80p,1005b,1353s stack positions out of 5000i,500n,10000p,200000b,80000s
+{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist
+/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/f
+onts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist
+/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/
+fonts/type1/public/lm/lmbx10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dis
+t/fonts/type1/public/lm/lmbx12.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-d
+ist/fonts/type1/public/lm/lmr10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-
+dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf
+-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texm
+f-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/te
+xmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/
+texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
+Output written on MyReport.pdf (13 pages, 282197 bytes).
+PDF statistics:
+ 408 PDF objects out of 1000 (max. 8388607)
+ 365 compressed objects within 4 object streams
+ 152 named destinations out of 1000 (max. 500000)
+ 30930 words of extra memory for PDF output out of 35830 (max. 10000000)
 
-!  ==> Fatal error occurred, no output PDF file produced!

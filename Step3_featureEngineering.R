@@ -39,12 +39,18 @@ data2<-merge(x=data2, y=language, by="LANGUAGE", all=TRUE)
 biodata <- data2%>% dplyr::select(where(is.numeric))
 data2<-data2%>%
   select(-GENDER,-ADMISSION_TYPE,-ADMISSION_LOCATION,-INSURANCE,-RELIGION,-MARITAL_STATUS,-DISCHARGE_LOCATION,-ETHNICITY,-LANGUAGE,
-         -ADMITTIME,-DISCHTIME,-DEATHTIME,-EDREGTIME,-EDOUTTIME,-DIAGNOSIS,-HAS_CHARTEVENTS_DATA,-DOB,-LOS2,-Period,-endGoldenHour,-nAdmissions,-HOSPITAL_EXPIRE_FLAG,
-         -deadBefore,-SUBJECT_ID,-DIAGNOSIS2,-DIAGNOSIS3,-X)
+         -DISCHTIME,-DEATHTIME,-EDREGTIME,-EDOUTTIME,-DIAGNOSIS,-HAS_CHARTEVENTS_DATA,-DOB,-LOS2,-Period,-endGoldenHour,-nAdmissions,-HOSPITAL_EXPIRE_FLAG,
+         -deadBefore,-SUBJECT_ID,-DIAGNOSIS2,-DIAGNOSIS3,-X,-dayOfYear,-Month,-week,-weekday,-year,-hour)
 
 data2<-merge(x=data2,y=lab, by="HADM_ID", all=TRUE)%>%
   replace(is.na(.), 0)
+data2<-merge(x=data2,y=microb, by="HADM_ID", all=TRUE)%>%
+  replace(is.na(.), 0)
 
+data2<-merge(x=data2,y=proc, by="HADM_ID", all=TRUE)%>%
+  replace(is.na(.), 0)
+data2<-merge(x=data2,y=med, by="HADM_ID", all=TRUE)%>%
+  replace(is.na(.), 0)
 
 #data<-data2
 #index = createDataPartition(data$HADM_ID, p = 0.70, list = FALSE)
