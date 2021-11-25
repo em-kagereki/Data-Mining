@@ -8,18 +8,20 @@ date: "2021/09/20 (Presented: `r Sys.Date()`)"
 
 output:
   xaringan::moon_reader:
-    css: xaringan-themer.css
+    css: ["xaringan-themer.css", "style.css"]
     lib_dir: libs
     nature:
+      fig_crop: no
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
       ratio: '16:9'
+      
 ---
 
 ```{r xaringan-themer, include=FALSE, warning=FALSE, message=FALSE}
 library(xaringanthemer)
-
+# https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html
 style_solarized_light(text_color = "#657b83", header_color = "#268bd2",
   background_color = "#fdf6e3", link_color = "#b58900",
   text_bold_color = "#d33682", text_slide_number_color = "#93a1a1",
@@ -33,7 +35,7 @@ style_solarized_light(text_color = "#657b83", header_color = "#268bd2",
   title_slide_background_color = "#002b36",
   title_slide_background_image = NA, title_slide_background_size = NA,
   title_slide_background_position = NA, footnote_color = NA,
-  footnote_font_size = "0.9em", footnote_position_bottom = "3em",
+  footnote_font_size = "0.7em", footnote_position_bottom = "1em",
   left_column_subtle_color = "#93a1a1",
   left_column_selected_color = "#586e75",
   blockquote_left_border_color = "#cb4b16", table_border_color = "#839496",
@@ -68,20 +70,22 @@ style_solarized_light(text_color = "#657b83", header_color = "#268bd2",
  - Deployment
 
 ---
-# Background
+# Acute Coronary Syndrome (ACS) 
 
 - Cardiovascular diseases (CVDs) are the leading cause of global mortality.
 - Prediction of prognosis model for patients with suspected ACS is important in critical care medicine.
-- Predicting likely outcome while the treatment is underway may help the clinicians make decisions proactively.
- - Syndromes Suggestive of Ischemia or Infarction
-- Acute Coronary Syndrome (ACS) is a term given to diverse presentations related to cardiomyopathies of sudden onset.
+- Syndromes Suggestive of Ischemia or Infarction is a term given to diverse presentations related to cardiomyopathies of sudden onset.
+
+- commonly used in the diagnosis of acute coronary syndrome and the related differential diagnosis include:
+
+*"stemi","acute coronary syndrome","angina","tachycardia","aortic aneurysm","pericardi","ortic dissection","coronary artery dissection","cardiomyopathy","heart failure","mitral valve disease","mitral stenosis","coronary artery disease","chf","congestive heart failure","heart failure","telemetry","myocardial infaction","cardiac arrest","myocardial infarction","aortic stenosis","st elevated","pericardial effusion", "cardiomyopathy","cath lab","tamponade","tamponede"*
 
 
 ---
-# Background
+# Proactively making clinical decisions.
 - Prediction of risk for untoward outcomes may help clinicians chose the type and intensity of therapy.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, out.width=800, out.height=430,fig.align="center"}
 #knitr::include_graphics("Hnet.com-image.PNG")
 knitr::include_graphics("workflow1.PNG")
 
@@ -108,27 +112,31 @@ ggplot(diamonds) +
 ```
 
 ---
-# Data Understanding
+# MIMIC-III database
 
-- MIMIC-III is a large, freely-available database comprising deidentified healthrelated data associated with 46,520 patients who stayed in critical care units of the Beth Israel Deaconess
-Medical Center between 2001 and 2012.
+- Freely-available database comprising deidentified health related data from 46,520 patients who stayed in critical care units of the Beth Israel Deaconess Medical Center between 2001 and 2012.
 
-- Researchers seeking to use the database must:
-1. Become a credentialed user on PhysioNet. This involves completion of a training course in human
+- Pre-requisite for data access:
+1. Become a credentialed user on PhysioNet after completion of a training course in human
 subjects research.
-2. Sign the data use agreement. Adherence to the terms of the DUA is paramount.
+2. Sign the data data usage agreement.
 
-- All data was collected downloaded  to  PostgreSQL database, and SQL queries were thereafter applied. 
-- Although the database includes 26 tables, only the ADMISSIONS,PATIENTS,SERVICES,DIAGNOSIS_ICD,MICROBIOLOGYEVENTS,
-PRESCRIPTIONS,PROCEDUREEVENTS_MV,D_ITEMS,D_LABITEMS`*`
+- All data was collected downloaded  to  PostgreSQL database. 
 
-.footnote[[*] This was enriched with the [Loinc tables](https://loinc.org/downloads/)]
+- Loinc data tables were used to enrich the data. [Loinc tables](https://loinc.org/downloads/)]
 
 ---
 
 ## Objectives
 
 The aim of the project was:
+
+ - Build a binary classification machine learning model to predict all-cause mortality of patients based on demographics and interventions within first hour of suspected ACS event.
+ 
+- Assess and report any work flow variations between patients who died and those who
+survived.
+
+This was achieved by:
 
 - This project aims at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause
 mortality after one hour of treatment(golden hour) using machine learning classification algorithm.
@@ -137,45 +145,79 @@ mortality after one hour of treatment(golden hour) using machine learning classi
 .footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
 
 ---
-# Data preparation
+# Data Mining
 
 - Data exploration.
-- Derived attributes.
-- Encoding of categorical variables.
-- Data standardization.
-- EVent log generation.
+- Data pre-processing
+- Model building and tuning
+- Process mining.
 ---
+class: full
 # Data access
 
-- After connecting to the PostgreSQL database,  SQL queries were made using the R dplyr interface.
+- After connecting to the PostgreSQL database,  SQL queries were made using the R dplyr interface. The following tables were collected:
 
-```{r, eval=FALSE,results='asis'}
-
-
-```
 
 ---
-# Data exploration.
+# Summary of study population
+# Distribution of admissions over time
+
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
+
+## https://exploratory.io/note/kanaugust/How-to-Create-Table-1-Summary-Information-YYf5BPf4Xs
 #source("summaryStats.R")
 
+#source("Step2_EDA.R")
 #source("Table1.R")
 #trial2
-```
-
----
-# Distribution of patients over time
-
-```{r, echo=FALSE, warning=FALSE,message=FALSE}
-
-#source("Step3_featureEngineering.R")
-
-#fig
 
 ```
 
 ---
-# Derived Attributes
+
+```{r, echo = FALSE,out.height="80%",out.width="80%", warning = FALSE,message=FALSE}
+
+#source("Step2_EDA.R")
+#ggplot(dataPlot1, aes(x = year, y = n)) + 
+#  geom_line(aes(color = status), size = 1) +
+#  ggtitle("From 2100 to 2190 (Full Data Set)") +
+#  xlab("Year(shifted)") + ylab("Number of admissions")+
+#  theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =18) 
+
+
+```
+
+---
+
+class: full
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+#https://pkg.garrickadenbuie.com/xaringanthemer/reference/theme_xaringan.html
+
+library(ggplot2)
+library(palmerpenguins)
+
+ggplot(penguins) +
+  aes(bill_length_mm, bill_depth_mm,
+      color = species) +
+  geom_point() +
+  theme_minimal() +
+  theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =18) +
+ # scale_xaringan_fill_discrete() +
+  labs(title = "Bill depth and length")
+```
+---
+
+# Diagnosis
+
+```{r}
+# http://loiyumba.github.io/2016-08-01-eurocup2016vis/
+```
+
+---
+class: full
+
+# Derived
 
 Some considerations were done
 .pull-left[
@@ -207,36 +249,29 @@ Datetime Features
 Some considerations were done
 .pull-left[
 Variables with high cardinality
-1. Start with a boilerplate HTML file;
+1. Diagnosis.
 
-1. Plain Markdown;
+2. Medication.
 
-1. Write JavaScript to autoplay slides;
-
-1. Manually configure MathJax;
-
-1. Highlight code with `*`;
-
-1. Edit Markdown source and refresh browser to see updated slides;
 ]
 
 .pull-right[
 Variables with less cardinality but need to preserve the variance
-1. Start with an R Markdown document;
+1. Language;
 
-1. R Markdown (can embed R/other code chunks);
+2. Tribe;
 
-1. Provide an option `autoplay`;
-
-1. MathJax just works;<sup>*</sup>
-
-1. Highlight code with `{{}}`;
-
-1. The RStudio addin "Infinite Moon Reader" automatically refreshes slides on changes;
 ]
 
 .footnote[[*] Not really. See next page.]
 
+Final dataset had
+---
+# Dimension reduction
+
+
+---
+# Selection number of components
 
 
 
@@ -262,8 +297,22 @@ Now we can use our validation set (k folds) to estimate the performance of our m
 The best model was:
 
 ---
+class: full
+
 # Model tuning
 
+```{r, echo = FALSE,out.height="80%",out.width="80%", warning = FALSE,message=FALSE}
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+
+library(dplyr)
+finalMetrics <- read.csv("final_metrics.csv", h=T, sep=',') %>% 
+  filter(.metric == "f_meas")
+ggplot(finalMetrics) +
+  geom_point(aes(x = mean, y = model,color = model))+
+  theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =18) +
+ # scale_xaringan_fill_discrete() +
+  labs(title = "Bill depth and length")
+```
 
 
 ---
@@ -272,394 +321,20 @@ The best model was:
 
 
 ---
-
-# HTML Widgets
-
-I have not thoroughly tested HTML widgets against **xaringan**. Some may work well, and some may not. It is a little tricky.
-
-Similarly, the Shiny mode (`runtime: shiny`) does not work. I might get these issues fixed in the future, but these are not of high priority to me. I never turn my presentation into a Shiny app. When I need to demonstrate more complicated examples, I just launch them separately. It is convenient to share slides with other people when they are plain HTML/JS applications.
-
-See the next page for two HTML widgets.
+# Selected model 
 
 
 ---
+class: full
+# Processes
 
-```{r eval=require('DT'), tidy=FALSE}
+```{r, echo = FALSE,out.height="80%",out.width="80%", warning = FALSE,message=FALSE}
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 
-DT::datatable(
-  head(iris, 10),
-  fillContainer = FALSE, options = list(pageLength = 8)
-)
+source("processMining.R")
+Process_Map
+
 ```
-
----
-
-# Some Tips
-
-- Do not forget to try the `yolo` option of `xaringan::moon_reader`.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        yolo: true
-    ```
-
----
-
-# Some Tips
-
-- Slides can be automatically played if you set the `autoplay` option under `nature`, e.g. go to the next slide every 30 seconds in a lightning talk:
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          autoplay: 30000
-    ```
-
-- If you want to restart the play after it reaches the last slide, you may set the sub-option `loop` to TRUE, e.g.,
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          autoplay:
-            interval: 30000
-            loop: true
-    ```
-
----
-
-# Some Tips
-
-- A countdown timer can be added to every page of the slides using the `countdown` option under `nature`, e.g. if you want to spend one minute on every page when you give the talk, you can set:
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          countdown: 60000
-    ```
-
-    Then you will see a timer counting down from `01:00`, to `00:59`, `00:58`, ... When the time is out, the timer will continue but the time turns red.
-    
----
-
-# Some Tips
-
-- The title slide is created automatically by **xaringan**, but it is just another remark.js slide added before your other slides.
-
-    The title slide is set to `class: center, middle, inverse, title-slide` by default. You can change the classes applied to the title slide with the `titleSlideClass` option of `nature` (`title-slide` is always applied).
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          titleSlideClass: [top, left, inverse]
-    ```
-    
---
-
-- If you'd like to create your own title slide, disable **xaringan**'s title slide with the `seal = FALSE` option of `moon_reader`.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        seal: false
-    ```
-
----
-
-# Some Tips
-
-- There are several ways to build incremental slides. See [this presentation](https://slides.yihui.org/xaringan/incremental.html) for examples.
-
-- The option `highlightLines: true` of `nature` will highlight code lines that start with `*`, or are wrapped in `{{ }}`, or have trailing comments `#<<`;
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          highlightLines: true
-    ```
-
-    See examples on the next page.
-
----
-
-# Some Tips
-
-
-.pull-left[
-An example using a leading `*`:
-
-    ```r
-    if (TRUE) {
-    ** message("Very important!")
-    }
-    ```
-Output:
-```r
-if (TRUE) {
-* message("Very important!")
-}
-```
-
-This is invalid R code, so it is a plain fenced code block that is not executed.
-]
-
-.pull-right[
-An example using `{{}}`:
-
-````
-`r ''````{r tidy=FALSE}
-if (TRUE) {
-*{{ message("Very important!") }}
-}
-```
-````
-Output:
-```{r tidy=FALSE}
-if (TRUE) {
-{{ message("Very important!") }}
-}
-```
-
-It is valid R code so you can run it. Note that `{{}}` can wrap an R expression of multiple lines.
-]
-
----
-
-# Some Tips
-
-An example of using the trailing comment `#<<` to highlight lines:
-
-````markdown
-`r ''````{r tidy=FALSE}
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +   #<<
-  geom_smooth()    #<<
-```
-````
-
-Output:
-
-```{r tidy=FALSE, eval=FALSE}
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +   #<<
-  geom_smooth()    #<<
-```
-
----
-
-# Some Tips
-
-When you enable line-highlighting, you can also use the chunk option `highlight.output` to highlight specific lines of the text output from a code chunk. For example, `highlight.output = TRUE` means highlighting all lines, and `highlight.output = c(1, 3)` means highlighting the first and third line.
-
-````md
-`r ''````{r, highlight.output=c(1, 3)}
-head(iris)
-```
-````
-
-```{r, highlight.output=c(1, 3), echo=FALSE}
-head(iris)
-```
-
-Question: what does `highlight.output = c(TRUE, FALSE)` mean? (Hint: think about R's recycling of vectors)
-
----
-
-# Some Tips
-
-- To make slides work offline, you need to download a copy of remark.js in advance, because **xaringan** uses the online version by default (see the help page `?xaringan::moon_reader`).
-
-- You can use `xaringan::summon_remark()` to download the latest or a specified version of remark.js. By default, it is downloaded to `libs/remark-latest.min.js`.
-
-- Then change the `chakra` option in YAML to point to this file, e.g.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        chakra: libs/remark-latest.min.js
-    ```
-
-- If you used Google fonts in slides (the default theme uses _Yanone Kaffeesatz_, _Droid Serif_, and _Source Code Pro_), they won't work offline unless you download or install them locally. The Heroku app [google-webfonts-helper](https://google-webfonts-helper.herokuapp.com/fonts) can help you download fonts and generate the necessary CSS.
-
----
-
-# Macros
-
-- remark.js [allows users to define custom macros](https://github.com/yihui/xaringan/issues/80) (JS functions) that can be applied to Markdown text using the syntax `![:macroName arg1, arg2, ...]` or `![:macroName arg1, arg2, ...](this)`. For example, before remark.js initializes the slides, you can define a macro named `scale`:
-
-    ```js
-    remark.macros.scale = function (percentage) {
-      var url = this;
-      return '<img src="' + url + '" style="width: ' + percentage + '" />';
-    };
-    ```
-
-    Then the Markdown text
-
-    ```markdown
-    ![:scale 50%](image.jpg)
-    ```
-
-    will be translated to
-    
-    ```html
-    <img src="image.jpg" style="width: 50%" />
-    ```
-
----
-
-# Macros (continued)
-
-- To insert macros in **xaringan** slides, you can use the option `beforeInit` under the option `nature`, e.g.,
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          beforeInit: "macros.js"
-    ```
-
-    You save your remark.js macros in the file `macros.js`.
-
-- The `beforeInit` option can be used to insert arbitrary JS code before `remark.create()`. Inserting macros is just one of its possible applications.
-
----
-
-# CSS
-
-Among all options in `xaringan::moon_reader`, the most challenging but perhaps also the most rewarding one is `css`, because it allows you to customize the appearance of your slides using any CSS rules or hacks you know.
-
-You can see the default CSS file [here](https://github.com/yihui/xaringan/blob/master/inst/rmarkdown/templates/xaringan/resources/default.css). You can completely replace it with your own CSS files, or define new rules to override the default. See the help page `?xaringan::moon_reader` for more information.
-
----
-
-# CSS
-
-For example, suppose you want to change the font for code from the default "Source Code Pro" to "Ubuntu Mono". You can create a CSS file named, say, `ubuntu-mono.css`:
-
-```css
-@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
-
-.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
-```
-
-Then set the `css` option in the YAML metadata:
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "ubuntu-mono.css"]
-```
-
-Here I assume `ubuntu-mono.css` is under the same directory as your Rmd.
-
-See [yihui/xaringan#83](https://github.com/yihui/xaringan/issues/83) for an example of using the [Fira Code](https://github.com/tonsky/FiraCode) font, which supports ligatures in program code.
-
----
-
-# CSS (with Sass)
-
-**xaringan** also supports Sass support via **rmarkdown**. Suppose you want to use the same color for different elements, e.g., first heading and bold text. You can create a `.scss` file, say `mytheme.scss`, using the [sass](https://sass-lang.com/) syntax with variables:
-
-```scss
-$mycolor: #ff0000; 
-.remark-slide-content > h1 { color: $mycolor; }
-.remark-slide-content strong { color: $mycolor; }
-```
-
-Then set the `css` option in the YAML metadata using this file placed under the same directory as your Rmd:
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "mytheme.scss"]
-```
-
-This requires **rmarkdown** >= 2.8 and the [**sass**](https://rstudio.github.io/sass/) package. You can learn more about **rmarkdown** and **sass** support in [this blog post](https://blog.rstudio.com/2021/04/15/2021-spring-rmd-news/#sass-and-scss-support-for-html-based-output) and in [**sass** overview vignette](https://rstudio.github.io/sass/articles/sass.html).
-
----
-
-# Themes
-
-Don't want to learn CSS? Okay, you can use some user-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
-
-```{r, R.options=list(width = 70)}
-names(xaringan:::list_css())
-```
-
----
-
-# Themes
-
-To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: [default, metropolis, metropolis-fonts]
-```
-
-If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.org/en/2017/10/xaringan-themes).
-
----
-class: inverse, middle, center
-background-image: url(https://upload.wikimedia.org/wikipedia/commons/3/39/Naruto_Shiki_Fujin.svg)
-background-size: contain
-
-# Naruto
-
----
-background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
-background-size: 100px
-background-position: 90% 8%
-
-# Sharingan
-
-The R package name **xaringan** was derived<sup>1</sup> from **Sharingan**, a dōjutsu in the Japanese anime _Naruto_ with two abilities:
-
-- the "Eye of Insight"
-
-- the "Eye of Hypnotism"
-
-I think a presentation is basically a way to communicate insights to the audience, and a great presentation may even "hypnotize" the audience.<sup>2,3</sup>
-
-.footnote[
-[1] In Chinese, the pronounciation of _X_ is _Sh_ /ʃ/ (as in _shrimp_). Now you should have a better idea of how to pronounce my last name _Xie_.
-
-[2] By comparison, bad presentations only put the audience to sleep.
-
-[3] Personally I find that setting background images for slides is a killer feature of remark.js. It is an effective way to bring visual impact into your presentations.
-]
-
----
-
-# Naruto terminology
-
-The **xaringan** package borrowed a few terms from Naruto, such as
-
-- [Sharingan](https://naruto.fandom.com/wiki/Sharingan) (写輪眼; the package name)
-
-- The [moon reader](https://naruto.fandom.com/wiki/Moon_Reader) (月読; an attractive R Markdown output format)
-
-- [Chakra](https://naruto.fandom.com/wiki/Chakra) (查克拉; the path to the remark.js library, which is the power to drive the presentation)
-
-- [Nature transformation](https://naruto.fandom.com/wiki/Nature_Transformation) (性質変化; transform the chakra by setting different options)
-
-- The [infinite moon reader](https://naruto.fandom.com/wiki/Infinite_Tsukuyomi) (無限月読; start a local web server to continuously serve your slides)
-
-- The [summoning technique](https://naruto.fandom.com/wiki/Summoning_Technique) (download remark.js from the web)
-
-You can click the links to know more about them if you want. The jutsu "Moon Reader" may seem a little evil, but that does not mean your slides are evil.
-
 ---
 
 class: center

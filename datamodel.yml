@@ -1,0 +1,16 @@
+---
+detect_relations: true
+
+User:
+  columns:
+    username: string
+    password: string
+    contact_id: integer
+
+Contact:
+  columns:
+    first_name: string
+    last_name: string
+    phone: string
+    email: string
+    address: string

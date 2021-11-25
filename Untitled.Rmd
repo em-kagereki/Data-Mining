@@ -1,0 +1,22 @@
+---
+output:
+  xaringan::moon_reader:
+    css: ["default", "style.css"]
+    lib_dir: libs
+    seal: FALSE
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+class: full
+
+```{r, echo=FALSE, warning = FALSE}
+library(datamodelr)
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4")
+dm <- dm_read_yaml("dataModel.yml")
+graph <- dm_create_graph(dm, rankdir = "BT",focus = focus)
+dm_render_graph(graph)
+```
+---

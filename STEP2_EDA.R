@@ -1,13 +1,23 @@
-setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
-
+#setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 source("Global.R")
-setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4")
-data<-read.csv("cardiacSyndromes.csv")%>% 
+pt <-read.csv("PATIENTS.csv")
+biodata <-read.csv("cardiacSyndromes.csv")
+service <- read.csv("serviceGroup.csv") %>% 
+  select(where(is.numeric) ,-X)
+lab <- read.csv("labGroup.csv") %>% 
+  select(where(is.numeric),-X)
+med <- read.csv("mediGroup.csv") %>% 
+  select(where(is.numeric),-X)
+microb <- read.csv("microGroup.csv") %>% 
+  select(where(is.numeric),-X)
+proc <- read.csv("procGroup.csv") %>% 
+  select(where(is.numeric),-X)
+
+data <-biodata %>% 
   mutate_all(na_if,"") %>% 
   mutate(MARITAL_STATUS = if_else(is.na(MARITAL_STATUS), "UNKNOWN", MARITAL_STATUS)) 
-
-
-data$MARITAL_STATUS<-str_replace_all(data$MARITAL_STATUS, "UNKNOWN (DEFAULT)", "UNKNOWN")
+data$MARITAL_STATUS<-trimws(data$MARITAL_STATUS)
+data$MARITAL_STATUS<-ifelse(grepl("(DEFAULT)",data$MARITAL_STATUS),"UNKNOWN",data$MARITAL_STATUS)
 
 #data$MARITAL_STATUS<-ifelse(grepl("UNKNOWN (DEFAULT)",data$MARITAL_STATUS),"UNKNOWN",data$MARITAL_STATUS)
 
@@ -26,39 +36,56 @@ data$ETHNICITY2<-ifelse(grepl("PORTUGUESE",data$ETHNICITY2),"CAUCASIAN",data$ETH
 data$ETHNICITY2<-ifelse(grepl("WHITE",data$ETHNICITY2),"CAUCASIAN",data$ETHNICITY2)
 data$ETHNICITY2<-ifelse(grepl("BLACK",data$ETHNICITY2),"BLACK",data$ETHNICITY2)
 data$ETHNICITY2<-ifelse(grepl("MULTI RACE ETHNICITY",data$ETHNICITY2),"OTHER",data$ETHNICITY2)
-data$ETHNICITY2<-ifelse(grepl("UNABLE TO OBTAIN",data$ETHNICITY2),"UNKNOWN",data$ETHNICITY2)
-theme_gtsummary_journal(journal = "jama")
-#> Setting theme `JAMA`
-#theme_gtsummary_compact()
-#> Setting theme `Compact
-table1<-data %>%
-  select(GENDER,AGE,INSURANCE,MARITAL_STATUS,ETHNICITY2,Outcome) %>%
-  mutate(INSURANCE = recode(INSURANCE, Medicaid = "Public",Medicare="Public",Government="Public")) %>% 
-  mutate(MARITAL_STATUS = recode(MARITAL_STATUS,DIVORCED = "Living alone",SEPARATED="Living alone",
-                                 SINGLE="Living alone",WIDOWED="Living alone",'LIFE PARTNER'="Living with Partner",
-                                 MARRIED="Living with Partner")) 
-
-
-table1<-data.frame(table1)
-
-#table1 <- gtsummary::tbl_summary(table1)
-
-
-date<-data 
-date$ADMITTIME<-as.Date(date$ADMITTIME)
-date<-date%>%
-  select(ADMITTIME) %>% 
-  count(ADMITTIME)
-
-# Time series
-ggplot(date, aes(x = ADMITTIME, y = n)) + 
-  theme_minimal()
+data$ETHNICITY2<-ifelse(grepl("UNABLE TO  cannot open the connection
+In addition: Warning message:
+ OBTAIN",data$ETHNICITY2),"UNKNOWN",data$ETHNICITY2)
 
 
 
 
 
+## Time PLot
+
+dataPlot <-biodata %>% 
+  select(ADMITTIME,EXPIRE_FLAG) %>% 
+  mutate(year = lubridate::year(ADMITTIME)) %>% 
+  select(-ADMITTIME)
+
+Dead<-dataPlot %>% 
+  filter(EXPIRE_FLAG==0) %>% 
+  count(year, sort = TRUE) %>% 
+  mutate(status = "Survived")
+
+survive<-dataPlot %>% 
+  filter(EXPIRE_FLAG== 1) %>% 
+  count(year, sort = TRUE) %>% 
+  mutate(status = "Dead")
+
+dataPlot1<-rbind(Dead,survive)
+
+dataPlot1
+
+dataPlot<-ggplot(dataPlot1, aes(x = year, y = n)) + 
+  geom_line(aes(color = status), size = 1) +
+  #scale_color_manual(values = c("#00AFBB", "#E7B800")) +
+  theme_economist() +
+  ggtitle("From 2100 to 2190 (Full Data Set)") +
+  xlab("Year(shifted)") + ylab("Number of admissions")
 
 
+
+p2 <- dataPlot1 %>%
+  #filter(year<2130) %>%
+  ggplot(aes(year, n)) +
+  #geom_line(color = palette_light()[[1]], alpha = 0.5) +
+  geom_line(aes(color = status), size = 1) +
+  #geom_point(color = palette_light()[[1]]) +
+  #geom_smooth(method = "loess", span = 0.2, se = FALSE) +
+  #theme_economist() +
+  theme_wsj()+
+  labs(
+    title = "2100 to 2130 (Zoomed In To Show Cycle)",
+    caption = "Number of admissions"
+  )
 
 

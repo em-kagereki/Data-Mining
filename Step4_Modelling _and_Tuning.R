@@ -495,30 +495,32 @@ tuned_xgb_metrics<-tuned_xgb_res %>%
 
 ### Tune LDA
 
-tune_lda_spec <- discrim_linear(penalty = tune()) %>%
+tune_lda_spec1 <- discrim_linear(penalty = 0.1, regularization_method = "min_distance" ) %>%
   set_mode("classification") %>%
   set_engine("MASS")
 
 tune_lda_wflow <- 
   workflow() %>% 
-  add_model(tune_lda_spec) %>% 
+  add_model(tune_lda_spec1) %>% 
   add_recipe(lr_recipe)
 
-lda_set <- parameters(penalty())
+lda_res1 <- 
+  lda_wflow %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)) 
 
-lda_grid <- 
-  grid_regular(lda_set, levels = c(25))
 
-set.seed(234)
-tuned_lda_res <- tune_grid(
-  tune_lda_wflow,
-  resamples = cv_folds,
-  grid = lda_grid,
-  metrics = metric_set(f_meas, 
-                       accuracy,kap,
-                       sens,spec),
-  control = ctrl
-)
+lda_metrics <- 
+  lda_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "LDA")
+
+
 
 
 #write.csv(xgb_metrics, "best_xgboost_metrics.csv")

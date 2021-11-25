@@ -6,15 +6,11 @@
     <meta name="author" content="Edwin Kagereki" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-    <link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
-    <script src="libs/datatables-binding-0.19/datatables.js"></script>
-    <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-    <link href="libs/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <link href="libs/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet" />
-    <script src="libs/dt-core-1.10.20/js/jquery.dataTables.min.js"></script>
-    <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
-    <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+    <script src="libs/viz-1.8.2/viz.js"></script>
+    <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+    <script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -23,7 +19,7 @@ class: center, middle, inverse, title-slide
 # Explainable artificial intelligence model to predict mortality in patients with suspected acute coronary syndrome
 ## MIMIC III ANALYSIS
 ### Edwin Kagereki
-### 2021/09/20 (Presented: 2021-11-23)
+### 2021/09/20 (Presented: 2021-11-24)
 
 ---
 
@@ -41,20 +37,22 @@ class: center, middle, inverse, title-slide
  - Deployment
 
 ---
-# Background
+# Acute Coronary Syndrome (ACS) 
 
 - Cardiovascular diseases (CVDs) are the leading cause of global mortality.
 - Prediction of prognosis model for patients with suspected ACS is important in critical care medicine.
-- Predicting likely outcome while the treatment is underway may help the clinicians make decisions proactively.
- - Syndromes Suggestive of Ischemia or Infarction
-- Acute Coronary Syndrome (ACS) is a term given to diverse presentations related to cardiomyopathies of sudden onset.
+- Syndromes Suggestive of Ischemia or Infarction is a term given to diverse presentations related to cardiomyopathies of sudden onset.
+
+- commonly used in the diagnosis of acute coronary syndrome and the related differential diagnosis include:
+
+*"stemi","acute coronary syndrome","angina","tachycardia","aortic aneurysm","pericardi","ortic dissection","coronary artery dissection","cardiomyopathy","heart failure","mitral valve disease","mitral stenosis","coronary artery disease","chf","congestive heart failure","heart failure","telemetry","myocardial infaction","cardiac arrest","myocardial infarction","aortic stenosis","st elevated","pericardial effusion", "cardiomyopathy","cath lab","tamponade","tamponede"*
 
 
 ---
-# Background
+# Proactively making clinical decisions.
 - Prediction of risk for untoward outcomes may help clinicians chose the type and intensity of therapy.
 
-&lt;img src="workflow1.PNG" width="1051" /&gt;
+&lt;img src="workflow1.PNG" width="800" height="430" style="display: block; margin: auto;" /&gt;
 
 
 .footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
@@ -65,27 +63,31 @@ class: center, middle, inverse, title-slide
 ![](Presentation_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 
 ---
-# Data Understanding
+# MIMIC-III database
 
-- MIMIC-III is a large, freely-available database comprising deidentified healthrelated data associated with 46,520 patients who stayed in critical care units of the Beth Israel Deaconess
-Medical Center between 2001 and 2012.
+- Freely-available database comprising deidentified health related data from 46,520 patients who stayed in critical care units of the Beth Israel Deaconess Medical Center between 2001 and 2012.
 
-- Researchers seeking to use the database must:
-1. Become a credentialed user on PhysioNet. This involves completion of a training course in human
+- Pre-requisite for data access:
+1. Become a credentialed user on PhysioNet after completion of a training course in human
 subjects research.
-2. Sign the data use agreement. Adherence to the terms of the DUA is paramount.
+2. Sign the data data usage agreement.
 
-- All data was collected downloaded  to  PostgreSQL database, and SQL queries were thereafter applied. 
-- Although the database includes 26 tables, only the ADMISSIONS,PATIENTS,SERVICES,DIAGNOSIS_ICD,MICROBIOLOGYEVENTS,
-PRESCRIPTIONS,PROCEDUREEVENTS_MV,D_ITEMS,D_LABITEMS`*`
+- All data was collected downloaded  to  PostgreSQL database. 
 
-.footnote[[*] This was enriched with the [Loinc tables](https://loinc.org/downloads/)]
+- Loinc data tables were used to enrich the data. [Loinc tables](https://loinc.org/downloads/)]
 
 ---
 
 ## Objectives
 
 The aim of the project was:
+
+ - Build a binary classification machine learning model to predict all-cause mortality of patients based on demographics and interventions within first hour of suspected ACS event.
+ 
+- Assess and report any work flow variations between patients who died and those who
+survived.
+
+This was achieved by:
 
 - This project aims at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause
 mortality after one hour of treatment(golden hour) using machine learning classification algorithm.
@@ -94,31 +96,47 @@ mortality after one hour of treatment(golden hour) using machine learning classi
 .footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
 
 ---
-# Data preparation
+# Data Mining
 
 - Data exploration.
-- Derived attributes.
-- Encoding of categorical variables.
-- Data standardization.
-- EVent log generation.
+- Data pre-processing
+- Model building and tuning
+- Process mining.
 ---
+class: full
 # Data access
 
-- After connecting to the PostgreSQL database,  SQL queries were made using the R dplyr interface.
+- After connecting to the PostgreSQL database,  SQL queries were made using the R dplyr interface. The following tables were collected:
+
+
+---
+# Summary of study population
+# Distribution of admissions over time
 
 
 
 ---
-# Data exploration.
-
-
----
-# Distribution of patients over time
 
 
 
 ---
-# Derived Attributes
+
+class: full
+
+&lt;img src="Presentation_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+# Diagnosis
+
+
+```r
+# http://loiyumba.github.io/2016-08-01-eurocup2016vis/
+```
+
+---
+class: full
+
+# Derived
 
 Some considerations were done
 .pull-left[
@@ -150,36 +168,29 @@ Datetime Features
 Some considerations were done
 .pull-left[
 Variables with high cardinality
-1. Start with a boilerplate HTML file;
+1. Diagnosis.
 
-1. Plain Markdown;
+2. Medication.
 
-1. Write JavaScript to autoplay slides;
-
-1. Manually configure MathJax;
-
-1. Highlight code with `*`;
-
-1. Edit Markdown source and refresh browser to see updated slides;
 ]
 
 .pull-right[
 Variables with less cardinality but need to preserve the variance
-1. Start with an R Markdown document;
+1. Language;
 
-1. R Markdown (can embed R/other code chunks);
+2. Tribe;
 
-1. Provide an option `autoplay`;
-
-1. MathJax just works;&lt;sup&gt;*&lt;/sup&gt;
-
-1. Highlight code with `{{}}`;
-
-1. The RStudio addin "Infinite Moon Reader" automatically refreshes slides on changes;
 ]
 
 .footnote[[*] Not really. See next page.]
 
+Final dataset had
+---
+# Dimension reduction
+
+
+---
+# Selection number of components
 
 
 
@@ -205,8 +216,11 @@ Now we can use our validation set (k folds) to estimate the performance of our m
 The best model was:
 
 ---
+class: full
+
 # Model tuning
 
+&lt;img src="Presentation_files/figure-html/unnamed-chunk-7-1.png" width="80%" height="80%" /&gt;
 
 
 ---
@@ -215,428 +229,15 @@ The best model was:
 
 
 ---
-
-# HTML Widgets
-
-I have not thoroughly tested HTML widgets against **xaringan**. Some may work well, and some may not. It is a little tricky.
-
-Similarly, the Shiny mode (`runtime: shiny`) does not work. I might get these issues fixed in the future, but these are not of high priority to me. I never turn my presentation into a Shiny app. When I need to demonstrate more complicated examples, I just launch them separately. It is convenient to share slides with other people when they are plain HTML/JS applications.
-
-See the next page for two HTML widgets.
+# Selected model 
 
 
 ---
-
-
-```r
-DT::datatable(
-  head(iris, 10),
-  fillContainer = FALSE, options = list(pageLength = 8)
-)
-```
-
-<div id="htmlwidget-ed1447c370d2319c5970" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ed1447c370d2319c5970">{"x":{"filter":"none","vertical":false,"fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sepal.Length<\/th>\n      <th>Sepal.Width<\/th>\n      <th>Petal.Length<\/th>\n      <th>Petal.Width<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
-
----
-
-# Some Tips
-
-- Do not forget to try the `yolo` option of `xaringan::moon_reader`.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        yolo: true
-    ```
-
----
-
-# Some Tips
-
-- Slides can be automatically played if you set the `autoplay` option under `nature`, e.g. go to the next slide every 30 seconds in a lightning talk:
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          autoplay: 30000
-    ```
-
-- If you want to restart the play after it reaches the last slide, you may set the sub-option `loop` to TRUE, e.g.,
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          autoplay:
-            interval: 30000
-            loop: true
-    ```
-
----
-
-# Some Tips
-
-- A countdown timer can be added to every page of the slides using the `countdown` option under `nature`, e.g. if you want to spend one minute on every page when you give the talk, you can set:
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          countdown: 60000
-    ```
-
-    Then you will see a timer counting down from `01:00`, to `00:59`, `00:58`, ... When the time is out, the timer will continue but the time turns red.
-    
----
-
-# Some Tips
-
-- The title slide is created automatically by **xaringan**, but it is just another remark.js slide added before your other slides.
-
-    The title slide is set to `class: center, middle, inverse, title-slide` by default. You can change the classes applied to the title slide with the `titleSlideClass` option of `nature` (`title-slide` is always applied).
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          titleSlideClass: [top, left, inverse]
-    ```
-    
---
-
-- If you'd like to create your own title slide, disable **xaringan**'s title slide with the `seal = FALSE` option of `moon_reader`.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        seal: false
-    ```
-
----
-
-# Some Tips
-
-- There are several ways to build incremental slides. See [this presentation](https://slides.yihui.org/xaringan/incremental.html) for examples.
-
-- The option `highlightLines: true` of `nature` will highlight code lines that start with `*`, or are wrapped in `{{ }}`, or have trailing comments `#&lt;&lt;`;
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          highlightLines: true
-    ```
-
-    See examples on the next page.
-
----
-
-# Some Tips
-
-
-.pull-left[
-An example using a leading `*`:
-
-    ```r
-    if (TRUE) {
-    ** message("Very important!")
-    }
-    ```
-Output:
-```r
-if (TRUE) {
-* message("Very important!")
-}
-```
-
-This is invalid R code, so it is a plain fenced code block that is not executed.
-]
-
-.pull-right[
-An example using `{{}}`:
-
-````
-```{r tidy=FALSE}
-if (TRUE) {
-*{{ message("Very important!") }}
-}
-```
-````
-Output:
-
-```r
-if (TRUE) {
-* message("Very important!") 
-}
-```
-
-```
-## Very important!
-```
-
-It is valid R code so you can run it. Note that `{{}}` can wrap an R expression of multiple lines.
-]
-
----
-
-# Some Tips
-
-An example of using the trailing comment `#&lt;&lt;` to highlight lines:
-
-````markdown
-```{r tidy=FALSE}
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +   #&lt;&lt;
-  geom_smooth()    #&lt;&lt;
-```
-````
-
-Output:
-
-
-```r
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-* geom_point() +
-* geom_smooth()
-```
-
----
-
-# Some Tips
-
-When you enable line-highlighting, you can also use the chunk option `highlight.output` to highlight specific lines of the text output from a code chunk. For example, `highlight.output = TRUE` means highlighting all lines, and `highlight.output = c(1, 3)` means highlighting the first and third line.
-
-````md
-```{r, highlight.output=c(1, 3)}
-head(iris)
-```
-````
-
-
-```
-*##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-## 1          5.1         3.5          1.4         0.2  setosa
-*## 2          4.9         3.0          1.4         0.2  setosa
-## 3          4.7         3.2          1.3         0.2  setosa
-## 4          4.6         3.1          1.5         0.2  setosa
-## 5          5.0         3.6          1.4         0.2  setosa
-## 6          5.4         3.9          1.7         0.4  setosa
-```
-
-Question: what does `highlight.output = c(TRUE, FALSE)` mean? (Hint: think about R's recycling of vectors)
-
----
-
-# Some Tips
-
-- To make slides work offline, you need to download a copy of remark.js in advance, because **xaringan** uses the online version by default (see the help page `?xaringan::moon_reader`).
-
-- You can use `xaringan::summon_remark()` to download the latest or a specified version of remark.js. By default, it is downloaded to `libs/remark-latest.min.js`.
-
-- Then change the `chakra` option in YAML to point to this file, e.g.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        chakra: libs/remark-latest.min.js
-    ```
-
-- If you used Google fonts in slides (the default theme uses _Yanone Kaffeesatz_, _Droid Serif_, and _Source Code Pro_), they won't work offline unless you download or install them locally. The Heroku app [google-webfonts-helper](https://google-webfonts-helper.herokuapp.com/fonts) can help you download fonts and generate the necessary CSS.
-
----
-
-# Macros
-
-- remark.js [allows users to define custom macros](https://github.com/yihui/xaringan/issues/80) (JS functions) that can be applied to Markdown text using the syntax `![:macroName arg1, arg2, ...]` or `![:macroName arg1, arg2, ...](this)`. For example, before remark.js initializes the slides, you can define a macro named `scale`:
-
-    ```js
-    remark.macros.scale = function (percentage) {
-      var url = this;
-      return '&lt;img src="' + url + '" style="width: ' + percentage + '" /&gt;';
-    };
-    ```
-
-    Then the Markdown text
-
-    ```markdown
-    ![:scale 50%](image.jpg)
-    ```
-
-    will be translated to
-    
-    ```html
-    &lt;img src="image.jpg" style="width: 50%" /&gt;
-    ```
-
----
-
-# Macros (continued)
-
-- To insert macros in **xaringan** slides, you can use the option `beforeInit` under the option `nature`, e.g.,
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          beforeInit: "macros.js"
-    ```
-
-    You save your remark.js macros in the file `macros.js`.
-
-- The `beforeInit` option can be used to insert arbitrary JS code before `remark.create()`. Inserting macros is just one of its possible applications.
-
----
-
-# CSS
-
-Among all options in `xaringan::moon_reader`, the most challenging but perhaps also the most rewarding one is `css`, because it allows you to customize the appearance of your slides using any CSS rules or hacks you know.
-
-You can see the default CSS file [here](https://github.com/yihui/xaringan/blob/master/inst/rmarkdown/templates/xaringan/resources/default.css). You can completely replace it with your own CSS files, or define new rules to override the default. See the help page `?xaringan::moon_reader` for more information.
-
----
-
-# CSS
-
-For example, suppose you want to change the font for code from the default "Source Code Pro" to "Ubuntu Mono". You can create a CSS file named, say, `ubuntu-mono.css`:
-
-```css
-@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
-
-.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
-```
-
-Then set the `css` option in the YAML metadata:
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "ubuntu-mono.css"]
-```
-
-Here I assume `ubuntu-mono.css` is under the same directory as your Rmd.
-
-See [yihui/xaringan#83](https://github.com/yihui/xaringan/issues/83) for an example of using the [Fira Code](https://github.com/tonsky/FiraCode) font, which supports ligatures in program code.
-
----
-
-# CSS (with Sass)
-
-**xaringan** also supports Sass support via **rmarkdown**. Suppose you want to use the same color for different elements, e.g., first heading and bold text. You can create a `.scss` file, say `mytheme.scss`, using the [sass](https://sass-lang.com/) syntax with variables:
-
-```scss
-$mycolor: #ff0000; 
-.remark-slide-content &gt; h1 { color: $mycolor; }
-.remark-slide-content strong { color: $mycolor; }
-```
-
-Then set the `css` option in the YAML metadata using this file placed under the same directory as your Rmd:
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "mytheme.scss"]
-```
-
-This requires **rmarkdown** &gt;= 2.8 and the [**sass**](https://rstudio.github.io/sass/) package. You can learn more about **rmarkdown** and **sass** support in [this blog post](https://blog.rstudio.com/2021/04/15/2021-spring-rmd-news/#sass-and-scss-support-for-html-based-output) and in [**sass** overview vignette](https://rstudio.github.io/sass/articles/sass.html).
-
----
-
-# Themes
-
-Don't want to learn CSS? Okay, you can use some user-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
-
-
-```r
-names(xaringan:::list_css())
-```
-
-```
-##  [1] "chocolate-fonts"  "chocolate"        "default-fonts"   
-##  [4] "default"          "duke-blue"        "fc-fonts"        
-##  [7] "fc"               "glasgow_template" "hygge-duke"      
-## [10] "hygge"            "ki-fonts"         "ki"              
-## [13] "kunoichi"         "lucy-fonts"       "lucy"            
-## [16] "metropolis-fonts" "metropolis"       "middlebury-fonts"
-## [19] "middlebury"       "nhsr-fonts"       "nhsr"            
-## [22] "ninjutsu"         "rladies-fonts"    "rladies"         
-## [25] "robot-fonts"      "robot"            "rutgers-fonts"   
-## [28] "rutgers"          "shinobi"          "tamu-fonts"      
-## [31] "tamu"             "uio-fonts"        "uio"             
-## [34] "uo-fonts"         "uo"               "uol-fonts"       
-## [37] "uol"              "useR-fonts"       "useR"            
-## [40] "uwm-fonts"        "uwm"
-```
-
----
-
-# Themes
-
-To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: [default, metropolis, metropolis-fonts]
-```
-
-If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.org/en/2017/10/xaringan-themes).
-
----
-class: inverse, middle, center
-background-image: url(https://upload.wikimedia.org/wikipedia/commons/3/39/Naruto_Shiki_Fujin.svg)
-background-size: contain
-
-# Naruto
-
----
-background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
-background-size: 100px
-background-position: 90% 8%
-
-# Sharingan
-
-The R package name **xaringan** was derived&lt;sup&gt;1&lt;/sup&gt; from **Sharingan**, a dōjutsu in the Japanese anime _Naruto_ with two abilities:
-
-- the "Eye of Insight"
-
-- the "Eye of Hypnotism"
-
-I think a presentation is basically a way to communicate insights to the audience, and a great presentation may even "hypnotize" the audience.&lt;sup&gt;2,3&lt;/sup&gt;
-
-.footnote[
-[1] In Chinese, the pronounciation of _X_ is _Sh_ /ʃ/ (as in _shrimp_). Now you should have a better idea of how to pronounce my last name _Xie_.
-
-[2] By comparison, bad presentations only put the audience to sleep.
-
-[3] Personally I find that setting background images for slides is a killer feature of remark.js. It is an effective way to bring visual impact into your presentations.
-]
-
----
-
-# Naruto terminology
-
-The **xaringan** package borrowed a few terms from Naruto, such as
-
-- [Sharingan](https://naruto.fandom.com/wiki/Sharingan) (写輪眼; the package name)
-
-- The [moon reader](https://naruto.fandom.com/wiki/Moon_Reader) (月読; an attractive R Markdown output format)
-
-- [Chakra](https://naruto.fandom.com/wiki/Chakra) (查克拉; the path to the remark.js library, which is the power to drive the presentation)
-
-- [Nature transformation](https://naruto.fandom.com/wiki/Nature_Transformation) (性質変化; transform the chakra by setting different options)
-
-- The [infinite moon reader](https://naruto.fandom.com/wiki/Infinite_Tsukuyomi) (無限月読; start a local web server to continuously serve your slides)
-
-- The [summoning technique](https://naruto.fandom.com/wiki/Summoning_Technique) (download remark.js from the web)
-
-You can click the links to know more about them if you want. The jutsu "Moon Reader" may seem a little evil, but that does not mean your slides are evil.
-
+class: full
+# Processes
+
+<div id="htmlwidget-06bdbd64f388f406c1bd" style="width:80%;height:80%;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-06bdbd64f388f406c1bd">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\",\n       rankdir = \"LR\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     weight = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"ACE Inhibitors\n4609\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"ACE Inhibitors\n4609\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#ECE7F2\"] \n  \"2\" [label = \"End\", shape = \"circle\", style = \"rounded,filled\", fontcolor = \"brown4\", color = \"brown4\", tooltip = \"ARTIFICIAL_END\n21251\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFFFFF\"] \n  \"3\" [label = \"Start\", shape = \"circle\", style = \"rounded,filled\", fontcolor = \"chartreuse4\", color = \"chartreuse4\", tooltip = \"ARTIFICIAL_START\n21251\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFFFFF\"] \n  \"4\" [label = \"Aspirin\n8628\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Aspirin\n8628\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"5\" [label = \"Beta blockers\n8990\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Beta blockers\n8990\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"6\" [label = \"Cardiac Cath\n473\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Cardiac Cath\n473\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFF7FB\"] \n  \"7\" [label = \"Chest X-Ray\n32719\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"white\", color = \"grey\", tooltip = \"Chest X-Ray\n32719\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#034E7B\"] \n  \"8\" [label = \"CT scan\n8779\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"CT scan\n8779\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"9\" [label = \"EKG\n13960\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"EKG\n13960\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#A6BDDB\"] \n  \"10\" [label = \"GpIIb/IIIa inhibitors\n1109\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"GpIIb/IIIa inhibitors\n1109\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFF7FB\"] \n  \"11\" [label = \"HMGCoA\n7698\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"HMGCoA\n7698\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"12\" [label = \"Morphine\n6611\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Morphine\n6611\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#ECE7F2\"] \n  \"13\" [label = \"Nitroglycerine\n6077\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Nitroglycerine\n6077\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#ECE7F2\"] \n\"1\"->\"2\" [label = \"1486\", penwidth = \"1.379178361827\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"4\" [label = \"556\", penwidth = \"1.14187292676703\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"5\" [label = \"755\", penwidth = \"1.19265118652718\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"6\" [label = \"10\", penwidth = \"1.00255167134473\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"7\" [label = \"192\", penwidth = \"1.04899208981883\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"8\" [label = \"32\", penwidth = \"1.00816534830314\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"9\" [label = \"98\", penwidth = \"1.02500637917836\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"10\" [label = \"105\", penwidth = \"1.02679254911967\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"11\" [label = \"620\", penwidth = \"1.15820362337331\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"12\" [label = \"419\", penwidth = \"1.10691502934422\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"13\" [label = \"336\", penwidth = \"1.08573615718295\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"1\" [label = \"642\", penwidth = \"1.16381730033172\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"4\" [label = \"2529\", penwidth = \"1.64531768308242\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"5\" [label = \"2083\", penwidth = \"1.53151314110743\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"6\" [label = \"84\", penwidth = \"1.02143403929574\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"7\" [label = \"5410\", penwidth = \"2.38045419749936\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"8\" [label = \"2502\", penwidth = \"1.63842817045165\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"9\" [label = \"3466\", penwidth = \"1.88440928808369\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"10\" [label = \"223\", penwidth = \"1.0569022709875\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"11\" [label = \"1839\", penwidth = \"1.46925236029599\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"12\" [label = \"1228\", penwidth = \"1.31334524113294\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"13\" [label = \"1245\", penwidth = \"1.31768308241898\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"1\" [label = \"812\", penwidth = \"1.20719571319214\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"2\" [label = \"787\", penwidth = \"1.20081653483031\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"5\" [label = \"1802\", penwidth = \"1.45981117632049\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"6\" [label = \"24\", penwidth = \"1.00612401122735\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"7\" [label = \"389\", penwidth = \"1.09926001531003\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"8\" [label = \"67\", penwidth = \"1.0170961980097\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"9\" [label = \"240\", penwidth = \"1.06124011227354\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"10\" [label = \"254\", penwidth = \"1.06481245215616\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"11\" [label = \"1703\", penwidth = \"1.43454963000766\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"12\" [label = \"1274\", penwidth = \"1.3250829293187\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"13\" [label = \"1276\", penwidth = \"1.32559326358765\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"1\" [label = \"1087\", penwidth = \"1.27736667517224\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"2\" [label = \"1907\", penwidth = \"1.48660372544016\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"4\" [label = \"1506\", penwidth = \"1.38428170451646\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"6\" [label = \"31\", penwidth = \"1.00791018116867\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"7\" [label = \"512\", penwidth = \"1.13064557285022\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"8\" [label = \"98\", penwidth = \"1.02500637917836\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"9\" [label = \"207\", penwidth = \"1.05281959683593\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"10\" [label = \"168\", penwidth = \"1.04286807859148\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"11\" [label = \"1766\", penwidth = \"1.45062515947946\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"12\" [label = \"924\", penwidth = \"1.23577443225313\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"13\" [label = \"784\", penwidth = \"1.20005103342689\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"1\" [label = \"20\", penwidth = \"1.00510334268946\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"2\" [label = \"171\", penwidth = \"1.0436335799949\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"4\" [label = \"6\", penwidth = \"1.00153100280684\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"5\" [label = \"12\", penwidth = \"1.00306200561368\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"6\" [label = \"46\", penwidth = \"1.01173768818576\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"7\" [label = \"107\", penwidth = \"1.02730288338862\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"8\" [label = \"14\", penwidth = \"1.00357233988262\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"9\" [label = \"77\", penwidth = \"1.01964786935443\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"11\" [label = \"4\", penwidth = \"1.00102066853789\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"12\" [label = \"8\", penwidth = \"1.00204133707578\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"13\" [label = \"8\", penwidth = \"1.00204133707578\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"1\" [label = \"250\", penwidth = \"1.06379178361827\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"2\" [label = \"7115\", penwidth = \"2.81551416177596\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"4\" [label = \"145\", penwidth = \"1.0369992344986\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"5\" [label = \"384\", penwidth = \"1.09798417963766\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"6\" [label = \"95\", penwidth = \"1.02424087777494\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"7\" [label = \"15676\", penwidth = \"5\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"8\" [label = \"3284\", penwidth = \"1.83796886960959\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"9\" [label = \"5414\", penwidth = \"2.38147486603725\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"10\" [label = \"6\", penwidth = \"1.00153100280684\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"11\" [label = \"165\", penwidth = \"1.04210257718806\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"12\" [label = \"148\", penwidth = \"1.03776473590202\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"13\" [label = \"37\", penwidth = \"1.0094411839755\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"1\" [label = \"47\", penwidth = \"1.01199285532023\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"2\" [label = \"2671\", penwidth = \"1.6815514161776\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"4\" [label = \"43\", penwidth = \"1.01097218678234\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"5\" [label = \"39\", penwidth = \"1.00995151824445\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"6\" [label = \"17\", penwidth = \"1.00433784128604\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"7\" [label = \"3335\", penwidth = \"1.85098239346772\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"8\" [label = \"1615\", penwidth = \"1.41209492217402\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"9\" [label = \"911\", penwidth = \"1.23245725950498\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"11\" [label = \"33\", penwidth = \"1.00842051543761\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"12\" [label = \"56\", penwidth = \"1.01428935953049\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"13\" [label = \"12\", penwidth = \"1.00306200561368\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"1\" [label = \"176\", penwidth = \"1.04490941566726\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"2\" [label = \"3467\", penwidth = \"1.88466445521817\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"4\" [label = \"170\", penwidth = \"1.04337841286042\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"5\" [label = \"382\", penwidth = \"1.09747384536872\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"6\" [label = \"118\", penwidth = \"1.03010972186782\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"7\" [label = \"5606\", penwidth = \"2.43046695585609\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"8\" [label = \"1044\", penwidth = \"1.2663944883899\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"9\" [label = \"2731\", penwidth = \"1.69686144424598\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"10\" [label = \"2\", penwidth = \"1.00051033426895\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"11\" [label = \"132\", penwidth = \"1.03368206175045\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"12\" [label = \"93\", penwidth = \"1.023730543506\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"13\" [label = \"39\", penwidth = \"1.00995151824445\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"1\" [label = \"137\", penwidth = \"1.03495789742281\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"2\" [label = \"127\", penwidth = \"1.03240622607808\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"4\" [label = \"231\", penwidth = \"1.05894360806328\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"5\" [label = \"187\", penwidth = \"1.04771625414647\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"6\" [label = \"5\", penwidth = \"1.00127583567237\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"7\" [label = \"8\", penwidth = \"1.00204133707578\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"8\" [label = \"2\", penwidth = \"1.00051033426895\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"9\" [label = \"27\", penwidth = \"1.00688951263077\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"11\" [label = \"210\", penwidth = \"1.05358509823935\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"12\" [label = \"85\", penwidth = \"1.02168920643021\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"13\" [label = \"90\", penwidth = \"1.02296504210258\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"1\" [label = \"792\", penwidth = \"1.20209237050268\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"2\" [label = \"1267\", penwidth = \"1.32329675937739\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"4\" [label = \"1482\", penwidth = \"1.3781576932891\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"5\" [label = \"1772\", penwidth = \"1.4521561622863\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"6\" [label = \"19\", penwidth = \"1.00484817555499\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"7\" [label = \"341\", penwidth = \"1.08701199285532\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"8\" [label = \"60\", penwidth = \"1.01531002806838\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"9\" [label = \"212\", penwidth = \"1.05409543250829\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"10\" [label = \"202\", penwidth = \"1.05154376116356\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"12\" [label = \"777\", penwidth = \"1.19826486348558\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"13\" [label = \"774\", penwidth = \"1.19749936208216\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"1\" [label = \"297\", penwidth = \"1.0757846389385\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"2\" [label = \"1659\", penwidth = \"1.42332227609084\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"4\" [label = \"833\", penwidth = \"1.21255422301608\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"5\" [label = \"717\", penwidth = \"1.1829548354172\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"6\" [label = \"15\", penwidth = \"1.0038275070171\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"7\" [label = \"642\", penwidth = \"1.16381730033172\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"8\" [label = \"50\", penwidth = \"1.01275835672365\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"9\" [label = \"317\", penwidth = \"1.08088798162797\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"10\" [label = \"56\", penwidth = \"1.01428935953049\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"11\" [label = \"549\", penwidth = \"1.14008675682572\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"13\" [label = \"1476\", penwidth = \"1.37662669048227\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"1\" [label = \"349\", penwidth = \"1.0890533299311\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"2\" [label = \"594\", penwidth = \"1.15156927787701\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"4\" [label = \"1127\", penwidth = \"1.28757336055116\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"5\" [label = \"857\", penwidth = \"1.21867823424343\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"6\" [label = \"9\", penwidth = \"1.00229650421026\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"7\" [label = \"501\", penwidth = \"1.12783873437101\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"8\" [label = \"11\", penwidth = \"1.0028068384792\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"9\" [label = \"260\", penwidth = \"1.066343454963\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"10\" [label = \"93\", penwidth = \"1.023730543506\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"11\" [label = \"677\", penwidth = \"1.17274815003828\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"12\" [label = \"1599\", penwidth = \"1.40801224802245\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 ---
 
 class: center
@@ -660,6 +261,7 @@ The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yih
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
+"fig_crop": false,
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
