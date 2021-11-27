@@ -1,6 +1,5 @@
 library(bupaR)
 library(dplyr)
-library(dplyr)
 library(stringr)
 library(tidyverse)
 library(tidyr)
@@ -17,6 +16,8 @@ library(gtsummary)
 library(tm)
 library(tidytext)
 library(data.table)
+library(pm4py)
+library(petrinetR)
 
 library(processcheckR)
 
@@ -104,15 +105,13 @@ a<-alive_XES %>%
   n_cases() 
 m<-data.frame(merge(x=d,y=a,by="r1"))
 
-library(epiR)
+#library(epiR)
 
 q2.m = matrix(c(m[1,3],m[1,2],m[2,3],m[2,2]), nrow=2, byrow=T, 
               dimnames = list(c("Alive", "Dead"),c("Asprin", "No")))
-epi.2by2(q2.m)
+#epi.2by2(q2.m)
 
-library(bupaR)
-library(pm4py)
-library(petrinetR)
+
 
 patients_complete <- alive_XES %>% filter_lifecycle("complete")
 model <- discovery_inductive(patients_complete)

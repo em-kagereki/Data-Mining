@@ -5,10 +5,6 @@
     <meta charset="utf-8" />
     <meta name="author" content="Edwin Kagereki" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-    <script src="libs/viz-1.8.2/viz.js"></script>
-    <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-    <script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
     <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
@@ -19,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Explainable artificial intelligence model to predict mortality in patients with suspected acute coronary syndrome
 ## MIMIC III ANALYSIS
 ### Edwin Kagereki
-### 2021/09/20 (Presented: 2021-11-24)
+### 2021/09/20 (Presented: 2021-11-26)
 
 ---
 
@@ -43,7 +39,7 @@ class: center, middle, inverse, title-slide
 - Prediction of prognosis model for patients with suspected ACS is important in critical care medicine.
 - Syndromes Suggestive of Ischemia or Infarction is a term given to diverse presentations related to cardiomyopathies of sudden onset.
 
-- commonly used in the diagnosis of acute coronary syndrome and the related differential diagnosis include:
+- Terms commonly used in the diagnosis of acute coronary syndrome and the related differential diagnosis include:
 
 *"stemi","acute coronary syndrome","angina","tachycardia","aortic aneurysm","pericardi","ortic dissection","coronary artery dissection","cardiomyopathy","heart failure","mitral valve disease","mitral stenosis","coronary artery disease","chf","congestive heart failure","heart failure","telemetry","myocardial infaction","cardiac arrest","myocardial infarction","aortic stenosis","st elevated","pericardial effusion", "cardiomyopathy","cath lab","tamponade","tamponede"*
 
@@ -57,10 +53,6 @@ class: center, middle, inverse, title-slide
 
 .footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
 
----
-
----
-![](Presentation_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 
 ---
 # MIMIC-III database
@@ -82,15 +74,15 @@ subjects research.
 
 The aim of the project was:
 
- - Build a binary classification machine learning model to predict all-cause mortality of patients based on demographics and interventions within first hour of suspected ACS event.
+ - Build a binary classifier to predict all-cause mortality of patients based on demographics and interventions within first hour of suspected ACS event.
  
-- Assess and report any work flow variations between patients who died and those who
+- Identify and describe variations in care pathway between patients who died and those who
 survived.
 
 This was achieved by:
 
-- This project aims at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause
-mortality after one hour of treatment(golden hour) using machine learning classification algorithm.
+- Developing a risk-prediction **machine learning classifier**, focusing on clinical end point of all-cause
+mortality after one hour of treatment(golden hour).
 - Explanation of the predicted outcome based on the care pathway using process mining. This AHA guideline(ACLS 2020) will was used as the gold standard for ACS workflow`*`.
 
 .footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
@@ -98,8 +90,8 @@ mortality after one hour of treatment(golden hour) using machine learning classi
 ---
 # Data Mining
 
-- Data exploration.
-- Data pre-processing
+- Data access and exploration
+- Data Preparation
 - Model building and tuning
 - Process mining.
 ---
@@ -108,22 +100,38 @@ class: full
 
 - After connecting to the PostgreSQL database,  SQL queries were made using the R dplyr interface. The following tables were collected:
 
+&lt;img src="database.PNG" width="800" height="430" style="display: block; margin: auto;" /&gt;
+
 
 ---
 # Summary of study population
-# Distribution of admissions over time
 
 
 
 ---
+# Data exploration
 
+
+![](Presentation_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
 
 
 ---
+class: .full
 
-class: full
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
 
 &lt;img src="Presentation_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+class: full
+
+&lt;img src="Presentation_files/figure-html/unnamed-chunk-6-1.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
 ---
 
 # Diagnosis
@@ -133,10 +141,81 @@ class: full
 # http://loiyumba.github.io/2016-08-01-eurocup2016vis/
 ```
 
+
+---
+# Data preparation
+
+1. Data cleaning.
+
+2. Data transformation  and merging.
+
+3. Derived variables
+
+4. Categorical variable encoding.
+
+5. Normalization.
+
+6. Dimension reduction
+---
+# Data cleaning
+
+Missing values
+.pull-left[
+1. Patient ID was used where admission ID was missing.
+
+2. Missing *ETHNICITY* and *MARITAL_STATUS*  was replaced with *UNKNOWN* 
+
+]
+Data formatting
+.pull-right[
+- Deletion of irrelevant word - Example *rule/out*, *status post*
+
+ - Modifying  incorrect, incomplete, irrelevant, duplicated, or improperly formatted data.
+
+Example of diagnosis:
+`$$3VD
+\begin{cases} 
+\text{3 vessel cad} \\
+\text{3 vessel coronary artery disease}\\
+\text{three vessel coronary artery disease}\\
+\text{3 vessel diagnosis}\\
+\text{3 vessel disease}
+\end{cases}$$`
+]
+
+
+
+---
+# Data enrichment 
+Done by appending the collected data with relevant context obtained from additional sources.
+
+- Data on drugs enriched with drug formularly: BNF
+
+- Laboratory drugs enhanced with the Loinc table
+
+---
+# Data transformation
+
+
+
+
+Data was transformed from the narrow format to the wide format.
+
+
+Step 1: Aggregation by Admission ID
+
+
+
+
+Step 2: Split into multiple columns
+
+
+
+
 ---
 class: full
 
-# Derived
+# Derived variables
 
 Some considerations were done
 .pull-left[
@@ -165,7 +244,8 @@ Datetime Features
 
 # Categorical variable encoding
 
-Some considerations were done
+All the  categorical variables were converted into numerical variables.
+
 .pull-left[
 Variables with high cardinality
 1. Diagnosis.
@@ -189,21 +269,55 @@ Final dataset had
 # Dimension reduction
 
 
----
-# Selection number of components
 
 
 
 ---
-# Modeling
 
-The following candidate models were chosen with the vanila methods
 
-- Logistic Regression
-- Random Forest,
-- XGBoost (extreme gradient boosted trees),
-- K-nearest neighbor
-- Artificial Neural network(ANN)
+--- 
+# Spliting
+
+&lt;img src="splitting.PNG" width="800" height="430" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Performance metric
+
+.pull-left[
+
+
+|                  	|          	| Patient outcome 	                     	|
+|:----------------:	|----------	|:-------------------:	|:-------------------:	|
+|                  	|          	| Dead            	| Survive            	|
+| Predicted outcome 	| Dead 	| true positive (tp) 	| false positive (fp) 	|
+|                  	| Survive 	| false negative (fn) 	|  true negative (tn) 	|
+
+]
+
+.pull-right[
+
+- The aim of the model was to maximize the identification of the patients at the highest risk of death (tp). 
+- F-beta measure  was used ( set at 2 to give less weight to precision and more weight to recall)
+`$$Recall =  \frac{TP}{TP+FN}$$`
+`$$Precision =  \frac{TP}{TP+FP}$$`
+`$$F-score =  2*\frac{Recall*Precision}{Precision+Recall}$$`
+
+]
+
+
+
+
+---
+# Candidate models
+
+To initiate the process the following candidate models were chosen
+
+- Regression based: Logistic regression, Linear discriminant,SVM 
+- Decision trees: Random forests, Gradient boosting.
+- Kernel based: k-Nearest neighbor.
+- Information based: Naive Bayes.
+- Quadratic discriminant analysis.
 
 Now we can use our validation set (k folds) to estimate the performance of our models using the fit_resamples() function to fit the models on each of the folds and store the results.
 
@@ -211,16 +325,15 @@ Now we can use our validation set (k folds) to estimate the performance of our m
 
 ---
 
-# Chosen model
+# Model tuning 
 
-The best model was:
+- Grid search algorithm was used to train multiple  models simultaneously.
+- Space-filling design to tune,  25 candidate models simultaneoulsy.
 
 ---
 class: full
 
-# Model tuning
-
-&lt;img src="Presentation_files/figure-html/unnamed-chunk-7-1.png" width="80%" height="80%" /&gt;
+&lt;img src="Presentation_files/figure-html/unnamed-chunk-12-1.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -236,18 +349,52 @@ class: full
 class: full
 # Processes
 
-<div id="htmlwidget-06bdbd64f388f406c1bd" style="width:80%;height:80%;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-06bdbd64f388f406c1bd">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\",\n       rankdir = \"LR\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     weight = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"ACE Inhibitors\n4609\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"ACE Inhibitors\n4609\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#ECE7F2\"] \n  \"2\" [label = \"End\", shape = \"circle\", style = \"rounded,filled\", fontcolor = \"brown4\", color = \"brown4\", tooltip = \"ARTIFICIAL_END\n21251\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFFFFF\"] \n  \"3\" [label = \"Start\", shape = \"circle\", style = \"rounded,filled\", fontcolor = \"chartreuse4\", color = \"chartreuse4\", tooltip = \"ARTIFICIAL_START\n21251\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFFFFF\"] \n  \"4\" [label = \"Aspirin\n8628\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Aspirin\n8628\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"5\" [label = \"Beta blockers\n8990\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Beta blockers\n8990\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"6\" [label = \"Cardiac Cath\n473\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Cardiac Cath\n473\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFF7FB\"] \n  \"7\" [label = \"Chest X-Ray\n32719\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"white\", color = \"grey\", tooltip = \"Chest X-Ray\n32719\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#034E7B\"] \n  \"8\" [label = \"CT scan\n8779\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"CT scan\n8779\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"9\" [label = \"EKG\n13960\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"EKG\n13960\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#A6BDDB\"] \n  \"10\" [label = \"GpIIb/IIIa inhibitors\n1109\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"GpIIb/IIIa inhibitors\n1109\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#FFF7FB\"] \n  \"11\" [label = \"HMGCoA\n7698\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"HMGCoA\n7698\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#D0D1E6\"] \n  \"12\" [label = \"Morphine\n6611\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Morphine\n6611\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#ECE7F2\"] \n  \"13\" [label = \"Nitroglycerine\n6077\", shape = \"rectangle\", style = \"rounded,filled\", fontcolor = \"black\", color = \"grey\", tooltip = \"Nitroglycerine\n6077\", penwidth = \"1.5\", fixedsize = \"FALSE\", fontname = \"Arial\", fontsize = \"10\", fillcolor = \"#ECE7F2\"] \n\"1\"->\"2\" [label = \"1486\", penwidth = \"1.379178361827\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"4\" [label = \"556\", penwidth = \"1.14187292676703\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"5\" [label = \"755\", penwidth = \"1.19265118652718\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"6\" [label = \"10\", penwidth = \"1.00255167134473\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"7\" [label = \"192\", penwidth = \"1.04899208981883\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"8\" [label = \"32\", penwidth = \"1.00816534830314\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"9\" [label = \"98\", penwidth = \"1.02500637917836\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"10\" [label = \"105\", penwidth = \"1.02679254911967\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"11\" [label = \"620\", penwidth = \"1.15820362337331\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"12\" [label = \"419\", penwidth = \"1.10691502934422\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"1\"->\"13\" [label = \"336\", penwidth = \"1.08573615718295\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"1\" [label = \"642\", penwidth = \"1.16381730033172\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"4\" [label = \"2529\", penwidth = \"1.64531768308242\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"5\" [label = \"2083\", penwidth = \"1.53151314110743\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"6\" [label = \"84\", penwidth = \"1.02143403929574\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"7\" [label = \"5410\", penwidth = \"2.38045419749936\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"8\" [label = \"2502\", penwidth = \"1.63842817045165\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"9\" [label = \"3466\", penwidth = \"1.88440928808369\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"10\" [label = \"223\", penwidth = \"1.0569022709875\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"11\" [label = \"1839\", penwidth = \"1.46925236029599\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"12\" [label = \"1228\", penwidth = \"1.31334524113294\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"3\"->\"13\" [label = \"1245\", penwidth = \"1.31768308241898\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"1\" [label = \"812\", penwidth = \"1.20719571319214\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"2\" [label = \"787\", penwidth = \"1.20081653483031\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"5\" [label = \"1802\", penwidth = \"1.45981117632049\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"6\" [label = \"24\", penwidth = \"1.00612401122735\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"7\" [label = \"389\", penwidth = \"1.09926001531003\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"8\" [label = \"67\", penwidth = \"1.0170961980097\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"9\" [label = \"240\", penwidth = \"1.06124011227354\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"10\" [label = \"254\", penwidth = \"1.06481245215616\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"11\" [label = \"1703\", penwidth = \"1.43454963000766\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"12\" [label = \"1274\", penwidth = \"1.3250829293187\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"4\"->\"13\" [label = \"1276\", penwidth = \"1.32559326358765\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"1\" [label = \"1087\", penwidth = \"1.27736667517224\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"2\" [label = \"1907\", penwidth = \"1.48660372544016\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"4\" [label = \"1506\", penwidth = \"1.38428170451646\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"6\" [label = \"31\", penwidth = \"1.00791018116867\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"7\" [label = \"512\", penwidth = \"1.13064557285022\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"8\" [label = \"98\", penwidth = \"1.02500637917836\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"9\" [label = \"207\", penwidth = \"1.05281959683593\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"10\" [label = \"168\", penwidth = \"1.04286807859148\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"11\" [label = \"1766\", penwidth = \"1.45062515947946\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"12\" [label = \"924\", penwidth = \"1.23577443225313\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"5\"->\"13\" [label = \"784\", penwidth = \"1.20005103342689\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"1\" [label = \"20\", penwidth = \"1.00510334268946\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"2\" [label = \"171\", penwidth = \"1.0436335799949\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"4\" [label = \"6\", penwidth = \"1.00153100280684\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"5\" [label = \"12\", penwidth = \"1.00306200561368\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"6\" [label = \"46\", penwidth = \"1.01173768818576\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"7\" [label = \"107\", penwidth = \"1.02730288338862\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"8\" [label = \"14\", penwidth = \"1.00357233988262\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"9\" [label = \"77\", penwidth = \"1.01964786935443\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"11\" [label = \"4\", penwidth = \"1.00102066853789\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"12\" [label = \"8\", penwidth = \"1.00204133707578\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"6\"->\"13\" [label = \"8\", penwidth = \"1.00204133707578\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"1\" [label = \"250\", penwidth = \"1.06379178361827\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"2\" [label = \"7115\", penwidth = \"2.81551416177596\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"4\" [label = \"145\", penwidth = \"1.0369992344986\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"5\" [label = \"384\", penwidth = \"1.09798417963766\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"6\" [label = \"95\", penwidth = \"1.02424087777494\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"7\" [label = \"15676\", penwidth = \"5\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"8\" [label = \"3284\", penwidth = \"1.83796886960959\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"9\" [label = \"5414\", penwidth = \"2.38147486603725\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"10\" [label = \"6\", penwidth = \"1.00153100280684\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"11\" [label = \"165\", penwidth = \"1.04210257718806\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"12\" [label = \"148\", penwidth = \"1.03776473590202\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"7\"->\"13\" [label = \"37\", penwidth = \"1.0094411839755\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"1\" [label = \"47\", penwidth = \"1.01199285532023\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"2\" [label = \"2671\", penwidth = \"1.6815514161776\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"4\" [label = \"43\", penwidth = \"1.01097218678234\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"5\" [label = \"39\", penwidth = \"1.00995151824445\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"6\" [label = \"17\", penwidth = \"1.00433784128604\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"7\" [label = \"3335\", penwidth = \"1.85098239346772\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"8\" [label = \"1615\", penwidth = \"1.41209492217402\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"9\" [label = \"911\", penwidth = \"1.23245725950498\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"11\" [label = \"33\", penwidth = \"1.00842051543761\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"12\" [label = \"56\", penwidth = \"1.01428935953049\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"8\"->\"13\" [label = \"12\", penwidth = \"1.00306200561368\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"1\" [label = \"176\", penwidth = \"1.04490941566726\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"2\" [label = \"3467\", penwidth = \"1.88466445521817\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"4\" [label = \"170\", penwidth = \"1.04337841286042\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"5\" [label = \"382\", penwidth = \"1.09747384536872\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"6\" [label = \"118\", penwidth = \"1.03010972186782\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"7\" [label = \"5606\", penwidth = \"2.43046695585609\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"8\" [label = \"1044\", penwidth = \"1.2663944883899\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"9\" [label = \"2731\", penwidth = \"1.69686144424598\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"10\" [label = \"2\", penwidth = \"1.00051033426895\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"11\" [label = \"132\", penwidth = \"1.03368206175045\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"12\" [label = \"93\", penwidth = \"1.023730543506\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"9\"->\"13\" [label = \"39\", penwidth = \"1.00995151824445\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"1\" [label = \"137\", penwidth = \"1.03495789742281\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"2\" [label = \"127\", penwidth = \"1.03240622607808\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"4\" [label = \"231\", penwidth = \"1.05894360806328\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"5\" [label = \"187\", penwidth = \"1.04771625414647\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"6\" [label = \"5\", penwidth = \"1.00127583567237\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"7\" [label = \"8\", penwidth = \"1.00204133707578\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"8\" [label = \"2\", penwidth = \"1.00051033426895\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"9\" [label = \"27\", penwidth = \"1.00688951263077\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"11\" [label = \"210\", penwidth = \"1.05358509823935\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"12\" [label = \"85\", penwidth = \"1.02168920643021\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"10\"->\"13\" [label = \"90\", penwidth = \"1.02296504210258\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"1\" [label = \"792\", penwidth = \"1.20209237050268\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"2\" [label = \"1267\", penwidth = \"1.32329675937739\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"4\" [label = \"1482\", penwidth = \"1.3781576932891\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"5\" [label = \"1772\", penwidth = \"1.4521561622863\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"6\" [label = \"19\", penwidth = \"1.00484817555499\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"7\" [label = \"341\", penwidth = \"1.08701199285532\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"8\" [label = \"60\", penwidth = \"1.01531002806838\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"9\" [label = \"212\", penwidth = \"1.05409543250829\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"10\" [label = \"202\", penwidth = \"1.05154376116356\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"12\" [label = \"777\", penwidth = \"1.19826486348558\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"11\"->\"13\" [label = \"774\", penwidth = \"1.19749936208216\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"1\" [label = \"297\", penwidth = \"1.0757846389385\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"2\" [label = \"1659\", penwidth = \"1.42332227609084\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"4\" [label = \"833\", penwidth = \"1.21255422301608\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"5\" [label = \"717\", penwidth = \"1.1829548354172\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"6\" [label = \"15\", penwidth = \"1.0038275070171\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"7\" [label = \"642\", penwidth = \"1.16381730033172\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"8\" [label = \"50\", penwidth = \"1.01275835672365\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"9\" [label = \"317\", penwidth = \"1.08088798162797\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"10\" [label = \"56\", penwidth = \"1.01428935953049\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"11\" [label = \"549\", penwidth = \"1.14008675682572\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"12\"->\"13\" [label = \"1476\", penwidth = \"1.37662669048227\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"1\" [label = \"349\", penwidth = \"1.0890533299311\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"2\" [label = \"594\", penwidth = \"1.15156927787701\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"4\" [label = \"1127\", penwidth = \"1.28757336055116\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"5\" [label = \"857\", penwidth = \"1.21867823424343\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"6\" [label = \"9\", penwidth = \"1.00229650421026\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"7\" [label = \"501\", penwidth = \"1.12783873437101\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"8\" [label = \"11\", penwidth = \"1.0028068384792\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"9\" [label = \"260\", penwidth = \"1.066343454963\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"10\" [label = \"93\", penwidth = \"1.023730543506\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"11\" [label = \"677\", penwidth = \"1.17274815003828\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n\"13\"->\"12\" [label = \"1599\", penwidth = \"1.40801224802245\", color = \"dodgerblue4\", fontname = \"Arial\", fontsize = \"10\", weight = \"1\", constraint = \"TRUE\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+
+---
+# Variance in pathways:(Activity and throughput time)
+
+All the  categorical variables were converted into numerical variables.
+---
+class: .full
+# Variance in pathways
+
+.pull-left[
+Alive
+
+&lt;img src="Alive.PNG" width="260" height="400" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+Dead
+&lt;img src="Dead.PNG" width="260" height="400" style="display: block; margin: auto;" /&gt;
+]
+
 ---
 
-class: center
 
-# Hand seals (印)
 
-Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
 
-![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
+---
+# Limitations
 
+- The data pre-processing may be a hindrance in model deployment - data encoding, PCA.
+
+- Random shifting of event dates may have an impact on the temporal sequence of the events.
+
+- Limited computation capacity thus more experiments were not run - dimension reduction(UMAP, t-SNE), Neural networks. 
+
+ 
+---
+# Conclusion
+
+- Successful extraction, loading and transformation of data from the MIMIC-III database.
+
+- Run data cleaning (text editing) data pre-processing (encoding (hash and frequency encoding), principal component analysis).
+
+- Built a machine learning classifier to predict all-cause mortality of the patients suspected to have acute cardiac syndrome.
+
+- Identified potential root causes of the patient outcome.
 ---
 
 class: center, middle

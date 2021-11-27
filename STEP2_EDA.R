@@ -1,4 +1,4 @@
-#setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 source("Global.R")
 pt <-read.csv("PATIENTS.csv")
 biodata <-read.csv("cardiacSyndromes.csv")
@@ -39,11 +39,14 @@ data$ETHNICITY2<-ifelse(grepl("MULTI RACE ETHNICITY",data$ETHNICITY2),"OTHER",da
 data$ETHNICITY2<-ifelse(grepl("UNABLE TO  cannot open the connection
 In addition: Warning message:
  OBTAIN",data$ETHNICITY2),"UNKNOWN",data$ETHNICITY2)
+data$Outcome <-data$EXPIRE_FLAG
 
 
+Table1Data<-data %>% 
+  select(ADMISSION_TYPE,ADMISSION_LOCATION,INSURANCE,LANGUAGE,RELIGION,MARITAL_STATUS,ETHNICITY2,Outcome,GENDER,AGE,nAdmissions)
 
 
-
+#write.csv(Table1Data, "Table1Data.csv")
 ## Time PLot
 
 dataPlot <-biodata %>% 

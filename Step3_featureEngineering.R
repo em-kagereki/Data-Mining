@@ -57,7 +57,6 @@ data2<-merge(x=data2,y=med, by="HADM_ID", all=TRUE)%>%
 #train = data[index, ]
 #test = data[-index, ]
 
-
 #train_y<-data.frame(train$EXPIRE_FLAG)
 #train<-train%>%
 #  select(-HADM_ID,-EXPIRE_FLAG)%>%
@@ -108,3 +107,14 @@ data2<-merge(x=data2,y=med, by="HADM_ID", all=TRUE)%>%
 #                 label = 'Horn\'s', vjust = -1, size = 8)) +
 #  geom_label(aes(x = elbow + 1, y = 50,
 #                 label = 'Elbow method', vjust = -1, size = 8))
+
+horn <- parallelPCA(pcaData)
+elbow <- findElbowPoint(p$variance)
+
+screePlot<-PCAtools::screeplot(p,
+                    components = getComponents(p, 1:20),
+                    vline = c(horn$n, elbow)) + 
+  geom_label(aes(x = horn$n + 1, y = 50,
+                 label = 'Horn\'s', vjust = -1, size = 8)) +
+  geom_label(aes(x = elbow + 1, y = 50,
+                 label = 'Elbow method', vjust = -1, size = 8))

@@ -16,7 +16,9 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       ratio: '16:9'
-      
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{pgfplots}      
 ---
 
 ```{r xaringan-themer, include=FALSE, warning=FALSE, message=FALSE}
@@ -55,7 +57,8 @@ style_solarized_light(text_color = "#657b83", header_color = "#268bd2",
   #code_font_url = "https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700",
   code_font_family_fallback = "'Lucida Console', Monaco", extra_css = NULL,
   extra_fonts = NULL, outfile = "xaringan-themer.css")
-
+  source("Global.R")
+  biodata <-read.csv("cardiacSyndromes.csv")
 
 ```
 
@@ -76,7 +79,7 @@ style_solarized_light(text_color = "#657b83", header_color = "#268bd2",
 - Prediction of prognosis model for patients with suspected ACS is important in critical care medicine.
 - Syndromes Suggestive of Ischemia or Infarction is a term given to diverse presentations related to cardiomyopathies of sudden onset.
 
-- commonly used in the diagnosis of acute coronary syndrome and the related differential diagnosis include:
+- Terms commonly used in the diagnosis of acute coronary syndrome and the related differential diagnosis include:
 
 *"stemi","acute coronary syndrome","angina","tachycardia","aortic aneurysm","pericardi","ortic dissection","coronary artery dissection","cardiomyopathy","heart failure","mitral valve disease","mitral stenosis","coronary artery disease","chf","congestive heart failure","heart failure","telemetry","myocardial infaction","cardiac arrest","myocardial infarction","aortic stenosis","st elevated","pericardial effusion", "cardiomyopathy","cath lab","tamponade","tamponede"*
 
@@ -89,27 +92,12 @@ style_solarized_light(text_color = "#657b83", header_color = "#268bd2",
 #knitr::include_graphics("Hnet.com-image.PNG")
 knitr::include_graphics("workflow1.PNG")
 
+
 ```
 
 
 .footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
 
----
-
----
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-library(ggplot2)
-ggplot(diamonds) +
-  aes(cut, fill = cut) +
-  geom_bar(show.legend = FALSE) +
-  labs(
-    x = "Cut",
-    y = "Count",
-    title = "A Fancy diamonds Plot"
-  ) +
-  theme_xaringan(background_color = "#FFFFFF") +
-  scale_xaringan_fill_discrete()
-```
 
 ---
 # MIMIC-III database
@@ -131,15 +119,15 @@ subjects research.
 
 The aim of the project was:
 
- - Build a binary classification machine learning model to predict all-cause mortality of patients based on demographics and interventions within first hour of suspected ACS event.
+ - Build a binary classifier to predict all-cause mortality of patients based on demographics and interventions within first hour of suspected ACS event.
  
-- Assess and report any work flow variations between patients who died and those who
+- Identify and describe variations in care pathway between patients who died and those who
 survived.
 
 This was achieved by:
 
-- This project aims at developing a risk-prediction tool for ACS, focusing on clinical end point of all-cause
-mortality after one hour of treatment(golden hour) using machine learning classification algorithm.
+- Developing a risk-prediction **machine learning classifier**, focusing on clinical end point of all-cause
+mortality after one hour of treatment(golden hour).
 - Explanation of the predicted outcome based on the care pathway using process mining. This AHA guideline(ACLS 2020) will was used as the gold standard for ACS workflow`*`.
 
 .footnote[[*]  [ACLS guideline](https://www.acls.net/images/algo-acs.pdf)]
@@ -147,8 +135,8 @@ mortality after one hour of treatment(golden hour) using machine learning classi
 ---
 # Data Mining
 
-- Data exploration.
-- Data pre-processing
+- Data access and exploration
+- Data Preparation
 - Model building and tuning
 - Process mining.
 ---
@@ -157,55 +145,72 @@ class: full
 
 - After connecting to the PostgreSQL database,  SQL queries were made using the R dplyr interface. The following tables were collected:
 
+```{r, echo=FALSE, out.width=800, out.height=430,fig.align="center"}
+#knitr::include_graphics("Hnet.com-image.PNG")
+knitr::include_graphics("database.PNG")
+
+
+```
+
 
 ---
 # Summary of study population
-# Distribution of admissions over time
+
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 
-## https://exploratory.io/note/kanaugust/How-to-Create-Table-1-Summary-Information-YYf5BPf4Xs
-#source("summaryStats.R")
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 
-#source("Step2_EDA.R")
 #source("Table1.R")
-#trial2
 
 ```
-
 ---
-
-```{r, echo = FALSE,out.height="80%",out.width="80%", warning = FALSE,message=FALSE}
-
-#source("Step2_EDA.R")
-#ggplot(dataPlot1, aes(x = year, y = n)) + 
-#  geom_line(aes(color = status), size = 1) +
-#  ggtitle("From 2100 to 2190 (Full Data Set)") +
-#  xlab("Year(shifted)") + ylab("Number of admissions")+
-#  theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =18) 
+# Data exploration
 
 
-```
+```{r, echo = FALSE, warning = FALSE,message=FALSE}
 
----
-
-class: full
-
-```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
-#https://pkg.garrickadenbuie.com/xaringanthemer/reference/theme_xaringan.html
-
-library(ggplot2)
-library(palmerpenguins)
-
-ggplot(penguins) +
-  aes(bill_length_mm, bill_depth_mm,
-      color = species) +
-  geom_point() +
-  theme_minimal() +
+ biodata %>%
+  ggplot( aes(x=AGE, fill=EXPIRE_FLAG)) +
+    geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') +
+    scale_fill_manual(values=c("#69b3a2", "#404080")) +
   theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =18) +
  # scale_xaringan_fill_discrete() +
-  labs(title = "Bill depth and length")
+  labs(title = "Distribution of age")
 ```
+
+
+---
+class: .full
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+
+ biodata %>%
+  ggplot( aes(x=AGE, fill=EXPIRE_FLAG)) +
+    geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') +
+    scale_fill_manual(values=c("#69b3a2", "#404080")) +
+  theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =16) +
+ # scale_xaringan_fill_discrete() +
+  labs(title = "Distribution of age")
+```
+
+
+
+---
+class: full
+
+```{r,fig.asp = 3/4,fig.align = 'center', echo = FALSE,warning=FALSE,out.width="80%", dpi=400, out.height="80%"}
+
+source("Step2_EDA.R")
+ggplot(dataPlot1, aes(x = year, y = n)) + 
+  geom_line(aes(color = status), size = 1) +
+  ggtitle("Distribution of admissions over time") +
+  xlab("Year(shifted)") + ylab("Number of admissions")+
+  theme_xaringan(background_color = "#fdf6e3",text_font_size = 10,title_font_size =14) 
+
+
+```
+
 ---
 
 # Diagnosis
@@ -214,10 +219,84 @@ ggplot(penguins) +
 # http://loiyumba.github.io/2016-08-01-eurocup2016vis/
 ```
 
+
+---
+# Data preparation
+
+1. Data cleaning.
+
+2. Data transformation  and merging.
+
+3. Derived variables
+
+4. Categorical variable encoding.
+
+5. Normalization.
+
+6. Dimension reduction
+---
+# Data cleaning
+
+Missing values
+.pull-left[
+1. Patient ID was used where admission ID was missing.
+
+2. Missing *ETHNICITY* and *MARITAL_STATUS*  was replaced with *UNKNOWN* 
+
+]
+Data formatting
+.pull-right[
+- Deletion of irrelevant word - Example *rule/out*, *status post*
+
+ - Modifying  incorrect, incomplete, irrelevant, duplicated, or improperly formatted data.
+
+Example of diagnosis:
+$$3VD
+\begin{cases} 
+\text{3 vessel cad} \\
+\text{3 vessel coronary artery disease}\\
+\text{three vessel coronary artery disease}\\
+\text{3 vessel diagnosis}\\
+\text{3 vessel disease}
+\end{cases}$$
+]
+
+
+
+---
+# Data enrichment 
+Done by appending the collected data with relevant context obtained from additional sources.
+
+- Data on drugs enriched with drug formularly: BNF
+
+- Laboratory drugs enhanced with the Loinc table
+
+---
+# Data transformation
+
+```{r, eval=FALSE, echo=FALSE}
+#Wide, or unstacked data is presented with each different data variable in a separate column. Narrow, or stacked data is presented #with one column containing all the values and another column listing the context of the value
+
+```
+
+
+Data was transformed from the narrow format to the wide format.
+
+
+Step 1: Aggregation by Admission ID
+
+
+
+
+Step 2: Split into multiple columns
+
+
+
+
 ---
 class: full
 
-# Derived
+# Derived variables
 
 Some considerations were done
 .pull-left[
@@ -246,7 +325,8 @@ Datetime Features
 
 # Categorical variable encoding
 
-Some considerations were done
+All the  categorical variables were converted into numerical variables.
+
 .pull-left[
 Variables with high cardinality
 1. Diagnosis.
@@ -270,21 +350,94 @@ Final dataset had
 # Dimension reduction
 
 
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+# setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+# 
+# pcaData<-read.csv("forPCA.csv") 
+# 
+# pcaData2<-pcaData%>% 
+#   select(-X,HADM_ID,-EXPIRE_FLAG)
+# 
+# p <- pca(pcaData2)
+# trainPcaPlot<-p$loadings[,1:17]
+# 
+# trainPcaPlot2<-cbind(pcaData$EXPIRE_FLAG,trainPcaPlot)
+# 
+# names(trainPcaPlot2)[names(trainPcaPlot2) == 'pcaData$EXPIRE_FLAG'] <- "Outcome"
+# trainPcaPlot2<-trainPcaPlot2 %>% 
+#   mutate(Outcome = ifelse(Outcome==0, "Survived","Died"))%>%
+#   ggplot(aes(PC1, PC2, color = Outcome)) + geom_point()
+# trainPcaPlot2
+
+
+
+```
+
+
 ---
-# Selection number of components
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+# horn <- parallelPCA(pcaData)
+# elbow <- findElbowPoint(p$variance)
+# 
+# screePlot<-PCAtools::screeplot(p,
+#                     components = getComponents(p, 1:20),
+#                     vline = c(horn$n, elbow)) + 
+#   geom_label(aes(x = horn$n + 1, y = 50,
+#                  label = 'Horn\'s', vjust = -1, size = 8)) +
+#   geom_label(aes(x = elbow + 1, y = 50,
+#                  label = 'Elbow method', vjust = -1, size = 8))
+# 
+# screePlot
+```
+
+--- 
+# Spliting
+
+```{r, echo=FALSE, out.width=800, out.height=430,fig.align="center"}
+#knitr::include_graphics("Hnet.com-image.PNG")
+knitr::include_graphics("splitting.PNG")
+
+
+```
+
+
+---
+# Performance metric
+
+.pull-left[
+
+
+|                  	|          	| Patient outcome 	                     	|
+|:----------------:	|----------	|:-------------------:	|:-------------------:	|
+|                  	|          	| Dead            	| Survive            	|
+| Predicted outcome 	| Dead 	| true positive (tp) 	| false positive (fp) 	|
+|                  	| Survive 	| false negative (fn) 	|  true negative (tn) 	|
+
+]
+
+.pull-right[
+
+- The aim of the model was to maximize the identification of the patients at the highest risk of death (tp). 
+- F-beta measure  was used ( set at 2 to give less weight to precision and more weight to recall)
+$$Recall =  \frac{TP}{TP+FN}$$
+$$Precision =  \frac{TP}{TP+FP}$$
+$$F-score =  2*\frac{Recall*Precision}{Precision+Recall}$$
+
+]
+
 
 
 
 ---
-# Modeling
+# Candidate models
 
-The following candidate models were chosen with the vanila methods
+To initiate the process the following candidate models were chosen
 
-- Logistic Regression
-- Random Forest,
-- XGBoost (extreme gradient boosted trees),
-- K-nearest neighbor
-- Artificial Neural network(ANN)
+- Regression based: Logistic regression, Linear discriminant,SVM 
+- Decision trees: Random forests, Gradient boosting.
+- Kernel based: k-Nearest neighbor.
+- Information based: Naive Bayes.
+- Quadratic discriminant analysis.
 
 Now we can use our validation set (k folds) to estimate the performance of our models using the fit_resamples() function to fit the models on each of the folds and store the results.
 
@@ -292,16 +445,15 @@ Now we can use our validation set (k folds) to estimate the performance of our m
 
 ---
 
-# Chosen model
+# Model tuning 
 
-The best model was:
+- Grid search algorithm was used to train multiple  models simultaneously.
+- Space-filling design to tune,  25 candidate models simultaneoulsy.
 
 ---
 class: full
 
-# Model tuning
-
-```{r, echo = FALSE,out.height="80%",out.width="80%", warning = FALSE,message=FALSE}
+```{r,fig.asp = 3/4,fig.align = 'center', echo = FALSE,warning=FALSE,out.width="80%", dpi=600, out.height="80%"}
 setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 
 library(dplyr)
@@ -309,9 +461,10 @@ finalMetrics <- read.csv("final_metrics.csv", h=T, sep=',') %>%
   filter(.metric == "f_meas")
 ggplot(finalMetrics) +
   geom_point(aes(x = mean, y = model,color = model))+
-  theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =18) +
+  theme_xaringan(background_color = "#fdf6e3",text_font_size =12 ,title_font_size =16) +
  # scale_xaringan_fill_discrete() +
-  labs(title = "Bill depth and length")
+ggtitle("Model performance") +
+  xlab("F-score") + ylab("Model")
 ```
 
 
@@ -329,22 +482,67 @@ class: full
 # Processes
 
 ```{r, echo = FALSE,out.height="80%",out.width="80%", warning = FALSE,message=FALSE}
-setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
-
-source("processMining.R")
-Process_Map
+# setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+# 
+# source("processMining.R")
+# Process_Map
 
 ```
 ---
+# Variance in pathways:(Activity and throughput time)
 
-class: center
+All the  categorical variables were converted into numerical variables.
+---
+class: .full
+# Variance in pathways
 
-# Hand seals (印)
+.pull-left[
+Alive
 
-Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
+```{r, echo=FALSE, out.width=260, out.height=400,fig.align="center"}
+#knitr::include_graphics("Hnet.com-image.PNG")
+knitr::include_graphics("Alive.PNG")
 
-![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
 
+```
+
+]
+
+.pull-right[
+Dead
+```{r, echo=FALSE, out.width=260, out.height=400,fig.align="center"}
+#knitr::include_graphics("Hnet.com-image.PNG")
+knitr::include_graphics("Dead.PNG")
+
+
+```
+]
+
+---
+
+
+
+
+---
+# Limitations
+
+- The data pre-processing may be a hindrance in model deployment - data encoding, PCA.
+
+- Random shifting of event dates may have an impact on the temporal sequence of the events.
+
+- Limited computation capacity thus more experiments were not run - dimension reduction(UMAP, t-SNE), Neural networks. 
+
+ 
+---
+# Conclusion
+
+- Successful extraction, loading and transformation of data from the MIMIC-III database.
+
+- Run data cleaning (text editing) data pre-processing (encoding (hash and frequency encoding), principal component analysis).
+
+- Built a machine learning classifier to predict all-cause mortality of the patients suspected to have acute cardiac syndrome.
+
+- Identified potential root causes of the patient outcome.
 ---
 
 class: center, middle
