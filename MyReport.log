@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.11.13)  26 NOV 2021 21:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.11.28)  28 NOV 2021 01:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **MyReport.tex
 (./MyReport.tex
 LaTeX2e <2021-11-15>
-L3 programming layer <2021-11-12> (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-di
+L3 programming layer <2021-11-22> (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-di
 st/tex/latex/base/article.cls
 Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
 (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size10.clo
@@ -365,7 +365,8 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@dimlist=\toks25
 )
 (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
-Package: fancyvrb 2021/10/15 v3.9 verbatim text (tvz,hv)
+Package: fancyvrb 2021/11/24\nobreakspace {} 4.1a\nobreakspace {}verbatim text 
+(tvz,hv)
 \FV@CodeLineNo=\count286
 \FV@InFile=\read2
 \FV@TabBox=\box53
@@ -1166,44 +1167,67 @@ LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
 85.
 (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [2] [3] [4] [5]
+) [2] [3] [4]
+<MyReport_files/figure-latex/unnamed-chunk-4-1.pdf, id=126, 469.755pt x 325.215
+pt>
+File: MyReport_files/figure-latex/unnamed-chunk-4-1.pdf Graphic file (type pdf)
+
+<use MyReport_files/figure-latex/unnamed-chunk-4-1.pdf>
+Package pdftex.def Info: MyReport_files/figure-latex/unnamed-chunk-4-1.pdf  use
+d on input line 594.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+<MyReport_files/figure-latex/unnamed-chunk-4-2.pdf, id=127, 469.755pt x 325.215
+pt>
+File: MyReport_files/figure-latex/unnamed-chunk-4-2.pdf Graphic file (type pdf)
+
+<use MyReport_files/figure-latex/unnamed-chunk-4-2.pdf>
+Package pdftex.def Info: MyReport_files/figure-latex/unnamed-chunk-4-2.pdf  use
+d on input line 595.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 594--596
+[][]
+ []
+
+[5] [6 <./MyReport_files/figure-latex/unnamed-chunk-4-1.pdf>]
 Missing character: There is no ] in font nullfont!
-[6pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) 
-has been already used, duplicate ignored
+[7 <./MyReport_files/figure-latex/unnamed-chunk-4-2.pdf>] [8pdfTeX warning (ext
+4): destination with the same identifier (name{figure.1}) has been already used
+, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.708 \section{Summary}\label{summary}}
-                                       ]
+l.727 \begin{Shaded}
+                    ]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 7
-17.
+28.
 (c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [7pdfTeX warning (ext4): destination with the same identifier (name{table.2})
- has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.802 \end{enumerate}
-                     ]
-Underfull \hbox (badness 5563) in paragraph at lines 813--814
+)
+Underfull \hbox (badness 5563) in paragraph at lines 824--825
 []\T1/lmr/m/it/10 (+20) ``stemi,''``acute coro-nary syn-drome,''``angina,''``ta
 chycardia,''``aortic aneurysm,''``pericardi,''``ortic dis-
  []
 
 
-Underfull \hbox (badness 2671) in paragraph at lines 813--814
+Underfull \hbox (badness 2671) in paragraph at lines 824--825
 \T1/lmr/m/it/10 (+20) sec-tion,''``coronary artery dis-sec-tion,''``cardiomyopa
 thy,''``heart fail-ure,''``mitral valve dis-ease,''``mitral
  []
 
-
-Overfull \hbox (25.68675pt too wide) in paragraph at lines 846--848
+[9pdfTeX warning (ext4): destination with the same identifier (name{table.2}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.825 
+      ]
+Overfull \hbox (25.68675pt too wide) in paragraph at lines 857--859
 []\T1/lmr/m/it/10 (-20) ``acebutolol,''``atenolol,''``betaxolol,''``bisoprolol,
 ''``carteolol,''``carvedilol,''``labetalol,''``metoprolol,''``nadolol,''``nebiv
 olol,''
  []
 
 
-Overfull \hbox (842.91815pt too wide) in paragraph at lines 875--877
+Overfull \hbox (842.91815pt too wide) in paragraph at lines 886--888
 []\T1/lmr/m/n/10 (-20) HMGCoA \T1/lmr/m/it/10 (-20) ``al-to-prev,''``amlodipine
 ,''``atorvastatin,''``caduet,''``crestor,''``ezallor,''``fluvastatin,''``lescol
 ,''``lipitor,''``livalo,''``lovastatin,''``mevacor,''``pitavastatin,''``pravach
@@ -1212,34 +1236,34 @@ ol,''``pravastatin,''``rosuvastatin,''``simcor,''``simvastatin,''``simvastatin,
 
  []
 
-[8] (./MyReport.aux) ) 
+[10] (./MyReport.aux) ) 
 Here is how much of TeX's memory you used:
- 35638 strings out of 480331
- 817192 string characters out of 5896458
- 1233759 words of memory out of 5000000
- 52589 multiletter control sequences out of 15000+600000
+ 35658 strings out of 480313
+ 818031 string characters out of 5896031
+ 1234934 words of memory out of 5000000
+ 52622 multiletter control sequences out of 15000+600000
  460262 words of font info for 140 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  84i,14n,80p,1005b,1353s stack positions out of 5000i,500n,10000p,200000b,80000s
-{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc
-/dvips/lm/lm-ec.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/d
-vips/lm/lm-mathsy.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc
-/dvips/lm/lm-rm.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/d
-vips/lm/lm-mathit.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc
-/dvips/lm/lm-ts1.enc}<c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/type
-1/public/lm/lmbx10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/ty
-pe1/public/lm/lmbx12.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/
-type1/public/lm/lmmi10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/font
-s/type1/public/lm/lmr10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fon
-ts/type1/public/lm/lmr12.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fo
-nts/type1/public/lm/lmr17.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/f
-onts/type1/public/lm/lmri10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist
-/fonts/type1/public/lm/lmsy10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-di
-st/fonts/type1/public/lm/lmtt10.pfb>
-Output written on MyReport.pdf (8 pages, 242721 bytes).
+{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/en
+c/dvips/lm/lm-ec.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/
+dvips/lm/lm-mathsy.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/en
+c/dvips/lm/lm-rm.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/
+dvips/lm/lm-mathit.enc}{c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/en
+c/dvips/lm/lm-ts1.enc}<c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/typ
+e1/public/lm/lmbx10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts/t
+ype1/public/lm/lmbx12.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fonts
+/type1/public/lm/lmmi10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fon
+ts/type1/public/lm/lmr10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/fo
+nts/type1/public/lm/lmr12.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/f
+onts/type1/public/lm/lmr17.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dist/
+fonts/type1/public/lm/lmri10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-dis
+t/fonts/type1/public/lm/lmsy10.pfb><c:/Users/HP/AppData/Roaming/TinyTeX/texmf-d
+ist/fonts/type1/public/lm/lmtt10.pfb>
+Output written on MyReport.pdf (10 pages, 767985 bytes).
 PDF statistics:
- 341 PDF objects out of 1000 (max. 8388607)
- 306 compressed objects within 4 object streams
- 131 named destinations out of 1000 (max. 500000)
- 30891 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 363 PDF objects out of 1000 (max. 8388607)
+ 322 compressed objects within 4 object streams
+ 133 named destinations out of 1000 (max. 500000)
+ 30901 words of extra memory for PDF output out of 35830 (max. 10000000)
 

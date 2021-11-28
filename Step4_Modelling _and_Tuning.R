@@ -586,15 +586,41 @@ Best_FInal_log_res %>%  collect_metrics(summarize = TRUE)
 
 log_auc <- 
   Best_FInal_log_res %>% 
-  collect_predictions(parameters = log_res) %>% 
+  collect_predictions(parameters = Best_FInal_log_res) %>% 
   roc_curve(EXPIRE_FLAG, .pred_0) %>% 
   mutate(model = "Logistic regression")
 
 log_pr <- 
   Best_FInal_log_res %>% 
-  collect_predictions(parameters = log_res) %>% 
+  collect_predictions(parameters = Best_FInal_log_res) %>% 
   pr_curve(EXPIRE_FLAG, .pred_0) %>% 
   mutate(model = "Logistic regression")
+
+log_pr <-data.frame(log_pr)
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+
+write.csv(log_pr, "logpr.csv")
+
+write.csv(log_auc, "auc.csv")
+
+
+prPlot<-read.csv("logpr.csv", sep=",", h=T)
+
+
+library(ggplot2)
+library(dplyr)
+bind_rows(log_auc) %>% 
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
+
+
+bind_rows(prPlot) %>% 
+  ggplot(aes(x = recall, y = precision)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
 
 
 last_log_fit <- 
@@ -609,13 +635,7 @@ Predictions<-last_log_fit %>%
 
 pr_curve(Predictions, EXPIRE_FLAG, .pred_class)
 
-library(ggplot2)
-library(dplyr)
-bind_rows(log_auc) %>% 
-  ggplot(aes(x = 1 - specificity, y = sensitivity)) + 
-  geom_path(lwd = 1.5, alpha = 0.8) +
-  geom_abline(lty = 3) + 
-  coord_equal()
+
 
 finalMetrics <- read.csv("final_metrics.csv", h=T, sep=',') %>% 
   filter(.metric == "f_meas")
@@ -628,3 +648,7 @@ ggplot(finalMetrics, aes(x = factor(model), y = mean)) +
 
 ggplot(finalMetrics) +
   geom_point(aes(x = mean, y = model,color = model))
+
+
+
+

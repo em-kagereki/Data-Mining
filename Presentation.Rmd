@@ -347,48 +347,84 @@ Variables with less cardinality but need to preserve the variance
 
 Final dataset had
 ---
-# Dimension reduction
+class: .full
 
+# Principle component analysis
 
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
-# setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
-# 
-# pcaData<-read.csv("forPCA.csv") 
-# 
-# pcaData2<-pcaData%>% 
-#   select(-X,HADM_ID,-EXPIRE_FLAG)
-# 
-# p <- pca(pcaData2)
-# trainPcaPlot<-p$loadings[,1:17]
-# 
-# trainPcaPlot2<-cbind(pcaData$EXPIRE_FLAG,trainPcaPlot)
-# 
-# names(trainPcaPlot2)[names(trainPcaPlot2) == 'pcaData$EXPIRE_FLAG'] <- "Outcome"
-# trainPcaPlot2<-trainPcaPlot2 %>% 
-#   mutate(Outcome = ifelse(Outcome==0, "Survived","Died"))%>%
-#   ggplot(aes(PC1, PC2, color = Outcome)) + geom_point()
-# trainPcaPlot2
+```{r,  fig.align = 'center', echo = FALSE,   warning = FALSE,message=FALSE}
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 
+data<-read.csv("dataforPCA.csv")
+index = createDataPartition(data$HADM_ID, p = 0.80, list = FALSE)
+train = data[index, ]
+test = data[-index, ]
+
+train_y<-data.frame(train$EXPIRE_FLAG)
+train<-train%>%
+  select(-HADM_ID,-EXPIRE_FLAG,-ADMITTIME)%>%
+  select_if(~!all(is.na(.))) # Remove any column with all 0s
+
+preObj <- preProcess(train, method=c("center", "scale"))
+train <- predict(preObj, train)
+train<-data.frame(train)
+
+p <- pca(train)
+
+trainPcaPlot<-p$loadings[,1:17]
+trainPcaPlot<-cbind(trainPcaPlot,train_y$train.EXPIRE_FLAG)
+names(trainPcaPlot)[names(trainPcaPlot) == 'train_y$train.EXPIRE_FLAG'] <- "Outcome"
+
+library(plotly)
+fig <- plot_ly()
+trainPcaPlot$Outcome <- as.factor(trainPcaPlot$Outcome)
+fig <- plot_ly(trainPcaPlot, x = ~PC1, y = ~PC2, z = ~PC3, color = ~Outcome, colors = c('#BF382A', '#0C4B8E'))
+fig <- fig %>% add_markers()
+fig <- fig %>% plotly::layout(scene = list(xaxis = list(title = 'PCA1'),
+                                           yaxis = list(title = 'PCA2'),
+                                           zaxis = list(title = 'PCA3')))
+
+fig
 
 
 ```
-
 
 ---
-```{r, echo=FALSE,warning=FALSE,message=FALSE}
-# horn <- parallelPCA(pcaData)
-# elbow <- findElbowPoint(p$variance)
-# 
-# screePlot<-PCAtools::screeplot(p,
-#                     components = getComponents(p, 1:20),
-#                     vline = c(horn$n, elbow)) + 
-#   geom_label(aes(x = horn$n + 1, y = 50,
-#                  label = 'Horn\'s', vjust = -1, size = 8)) +
-#   geom_label(aes(x = elbow + 1, y = 50,
-#                  label = 'Elbow method', vjust = -1, size = 8))
-# 
-# screePlot
+class: .full
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE, message=FALSE}
+horn <- parallelPCA(train)
+#horn$n
+
+
+elbow <- findElbowPoint(p$variance)
+#elbow
+
+Ninty<- which(cumsum(p$variance) > 90)[1]
+
+
+elbow <- findElbowPoint(p$variance)
+
+screePlot<-PCAtools::screeplot(p,
+                               components = getComponents(p, 1:20),
+                               vline = c(horn$n, elbow)) + 
+  geom_label(aes(x = horn$n + 1, y = 50,
+                 label = 'Horn\'s', vjust = -1, size = 8)) +
+  geom_label(aes(x = elbow + 1, y = 50,
+                 label = 'Elbow method', vjust = -1, size = 8)) +
+  ggtitle("Threshold for number of Components") +
+  theme_xaringan(background_color = "#fdf6e3",text_font_size = 10,title_font_size =14) 
+
+screePlot
+
 ```
+
+---
+
+# Components used
+
+- The Elbow method suggested `r elbow` components, the `r horn$n` suggested.
+
+-  `r Ninty` components (accounting for 90% of variance were however chosen) were selected for further analysis.
+
 
 --- 
 # Spliting
@@ -460,7 +496,7 @@ library(dplyr)
 finalMetrics <- read.csv("final_metrics.csv", h=T, sep=',') %>% 
   filter(.metric == "f_meas")
 ggplot(finalMetrics) +
-  geom_point(aes(x = mean, y = model,color = model))+
+  geom_point(aes(x = mean, y = model))+
   theme_xaringan(background_color = "#fdf6e3",text_font_size =12 ,title_font_size =16) +
  # scale_xaringan_fill_discrete() +
 ggtitle("Model performance") +
@@ -468,14 +504,41 @@ ggtitle("Model performance") +
 ```
 
 
----
-
-# Determining the most appropriate cut-off value
 
 
 ---
+
+class: .full
 # Selected model 
 
+
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE, message=FALSE}
+
+library(ggpubr)
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+
+prPlot<-read.csv("logpr.csv", sep=",", h=T)
+aucPlot<-read.csv("auc.csv", sep=",", h=T)
+
+auc<-bind_rows(aucPlot) %>% 
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
+
+
+pr<-bind_rows(prPlot) %>% 
+  ggplot(aes(x = recall, y = precision)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
+
+ggarrange(pr, auc + rremove("x.text"), 
+          labels = c("precision-recall", "AUC"),
+          ncol = 2, nrow = 2)
+
+```
 
 ---
 class: full
@@ -497,7 +560,7 @@ class: .full
 # Variance in pathways
 
 .pull-left[
-Alive
+Dead
 
 ```{r, echo=FALSE, out.width=260, out.height=400,fig.align="center"}
 #knitr::include_graphics("Hnet.com-image.PNG")
@@ -509,7 +572,7 @@ knitr::include_graphics("Alive.PNG")
 ]
 
 .pull-right[
-Dead
+Alive
 ```{r, echo=FALSE, out.width=260, out.height=400,fig.align="center"}
 #knitr::include_graphics("Hnet.com-image.PNG")
 knitr::include_graphics("Dead.PNG")
@@ -519,7 +582,14 @@ knitr::include_graphics("Dead.PNG")
 ]
 
 ---
-
+# Patients who started with aspirin.
+```{r, echo=FALSE,warning=FALSE,comment=NA}
+q2.m = matrix(c(5330,873,3446,312), nrow=2, byrow=T, 
+              dimnames = list(c("Alive", "Dead"),c("Asprin", "No")))
+#5330,873,3446,312
+q2.m
+epiR::epi.2by2(q2.m)
+```
 
 
 
@@ -549,6 +619,5 @@ class: center, middle
 
 # Thanks!
 
-Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+The code for the  [**Data Mining**](https://github.com/em-kagereki/Data-Mining).
 
-The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yihui.org/knitr/), and [R Markdown](https://rmarkdown.rstudio.com).

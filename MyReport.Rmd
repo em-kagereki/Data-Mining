@@ -247,15 +247,60 @@ Dimension reduction.
 Principal component analysis was used to reduce the dimensionality of the data.
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE}
-#pcaPlot
 
-#screePlot
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 
-# https://towardsdatascience.com/dimensionality-reduction-for-data-visualization-pca-vs-tsne-vs-umap-be4aa7b1cb29
+data<-read.csv("dataforPCA.csv")
+index = createDataPartition(data$HADM_ID, p = 0.80, list = FALSE)
+train = data[index, ]
+test = data[-index, ]
+
+train_y<-data.frame(train$EXPIRE_FLAG)
+train<-train%>%
+  select(-HADM_ID,-EXPIRE_FLAG,-ADMITTIME)%>%
+  select_if(~!all(is.na(.))) # Remove any column with all 0s
+
+preObj <- preProcess(train, method=c("center", "scale"))
+train <- predict(preObj, train)
+train<-data.frame(train)
+
+p <- pca(train)
+
+trainPcaPlot<-p$loadings[,1:17]
+trainPcaPlot<-cbind(trainPcaPlot,train_y$train.EXPIRE_FLAG)
+names(trainPcaPlot)[names(trainPcaPlot) == 'train_y$train.EXPIRE_FLAG'] <- "Outcome"
+pcaPlot<-trainPcaPlot %>% 
+  mutate(Outcome = ifelse(Outcome==0, "Survived","Died"))%>%
+  ggplot(aes(PC1, PC2, color = Outcome)) + geom_point()
+
+pcaPlot
+
+horn <- parallelPCA(train)
+#horn$n
+
+
+elbow <- findElbowPoint(p$variance)
+#elbow
+
+Ninty<- which(cumsum(p$variance) > 90)[1]
+
+
+elbow <- findElbowPoint(p$variance)
+
+screePlot<-PCAtools::screeplot(p,
+                               components = getComponents(p, 1:20),
+                               vline = c(horn$n, elbow)) + 
+  geom_label(aes(x = horn$n + 1, y = 50,
+                 label = 'Horn\'s', vjust = -1, size = 8)) +
+  geom_label(aes(x = elbow + 1, y = 50,
+                 label = 'Elbow method', vjust = -1, size = 8))
+
+screePlot
+
 
 ```
 
-
+The Elbow method suggested `r elbow` components, the `r horn$n` suggested. However, `r Ninty` components (accounting for 90% of variance were however chosen) were selected for further analysis.
 
 ## Final Dataset
 
@@ -340,22 +385,31 @@ This was implemented by use of a space-filling design to tune, with 25 candidate
 
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE, results='hide'}
-
-
-
-# nnet_metrics <- 
-#   nnet_res %>% 
-#   collect_metrics(summarise = TRUE) %>%
-#   mutate(model = "Neural Net"
+# https://medium.com/@c3_62722/process-mining-with-python-tutorial-a-healthcare-application-part-3-cc9af986c122#:~:text=Heuristics%20Miner%20(Weijters%3B%20Bogarin%20et,it%20does%20not%20guarantee%20soundness.
 
 ```
 
 ### Best model Description
 
+The best model was a logistic regression model with the penalty of 0.01 and mixture of 0.5
 
 # Model explanation
 
-Sequencing the events 
+Process discovery was done by the implementation of the  heuristics miner algorithm. 
+
+
+
+
+```{r, echo=FALSE, out.width=260, out.height=400,fig.align="center"}
+# #knitr::include_graphics("Hnet.com-image.PNG")
+# knitr::include_graphics("Alive.PNG")
+# 
+# #knitr::include_graphics("Hnet.com-image.PNG")
+# knitr::include_graphics("Dead.PNG")
+
+
+```
+
 
 
 
