@@ -181,22 +181,6 @@ setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-c
 
 
 ---
-class: .full
-
-```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
-
- biodata %>%
-  ggplot( aes(x=AGE, fill=EXPIRE_FLAG)) +
-    geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') +
-    scale_fill_manual(values=c("#69b3a2", "#404080")) +
-  theme_xaringan(background_color = "#fdf6e3",text_font_size = 12,title_font_size =16) +
- # scale_xaringan_fill_discrete() +
-  labs(title = "Distribution of age")
-```
-
-
-
----
 class: full
 
 ```{r,fig.asp = 3/4,fig.align = 'center', echo = FALSE,warning=FALSE,out.width="80%", dpi=400, out.height="80%"}

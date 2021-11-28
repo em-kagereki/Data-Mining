@@ -113,18 +113,30 @@ It is also assumed that:
 
 Since the  aim of the model was to identify the patients who were at the highest risk of dying, the F-beta score was chosen. It was assumed that misclassification of a patient who survived was less costly as compared to misclassifying  a patient who was at a high risk dying. Therfore the F-beta measure  was used ( set at 2 to give less weight to precision and more weight to recall)
 
+\begin{minipage}[t]{0.5\textwidth}
 $$Recall =  \frac{TP}{TP+FN}$$
 
 $$Precision =  \frac{TP}{TP+FP}$$
-
 $$F-score =  2*\frac{Recall*Precision}{Precision+Recall}$$
 
-|                  	|          	| Ground Truth Values 	                     	|
-|:----------------:	|----------	|:-------------------:	|:-------------------:	|
-|                  	|          	| Positive            	| Negative            	|
-| Predicted Values 	| Positive 	|  true positive (tp) 	| false positive (fp) 	|
-|                  	| Negative 	| false negative (fn) 	|  true negative (tn) 	|
 
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+
+\begin{table}[]
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{Variable} & Level pf measurement                                                              \\ \hline
+Age                            & Includes patient level data per admission                                         \\ \hline
+Laboratory                     & All the laboratory services per patient, this was enriched with the LOINC dataset \\ \hline
+Procedures                     & All the procedures that were done to the patient during the admission             \\ \hline
+Microbiology                   & All the microB that was done                                                      \\ \hline
+Prescriptions                  &                                                                                   \\ \hline
+Services                       &                                                                                   \\ \hline
+\end{tabular}
+\end{table}
+
+\end{minipage}
 
 
 
@@ -246,7 +258,8 @@ Dimension reduction.
 
 Principal component analysis was used to reduce the dimensionality of the data.
 
-```{r, echo=FALSE,warning=FALSE,message=FALSE}
+```{r, echo=FALSE,warning=FALSE,message=FALSE, out.width="100%"}
+library(ggpubr)
 
 setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
 
@@ -273,7 +286,7 @@ pcaPlot<-trainPcaPlot %>%
   mutate(Outcome = ifelse(Outcome==0, "Survived","Died"))%>%
   ggplot(aes(PC1, PC2, color = Outcome)) + geom_point()
 
-pcaPlot
+
 
 horn <- parallelPCA(train)
 #horn$n
@@ -295,17 +308,17 @@ screePlot<-PCAtools::screeplot(p,
   geom_label(aes(x = elbow + 1, y = 50,
                  label = 'Elbow method', vjust = -1, size = 8))
 
+pcaPlot
+
 screePlot
 
 
 ```
 
-The Elbow method suggested `r elbow` components, the `r horn$n` suggested. However, `r Ninty` components (accounting for 90% of variance were however chosen) were selected for further analysis.
+
 
 ## Final Dataset
-
-Finally the chosen dataset factoring in 90% of the variance was factored in. This was used for the final analysis.
-
+The Elbow method suggested `r elbow` components, the `r horn$n` suggested. However, `r Ninty` components (accounting for 90% of variance were however chosen) were selected for further analysis. This was selected after experimentation for the model performance.
 
 
 ## Construction of event logs
@@ -393,22 +406,59 @@ This was implemented by use of a space-filling design to tune, with 25 candidate
 
 The best model was a logistic regression model with the penalty of 0.01 and mixture of 0.5
 
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE, message=FALSE}
+
+library(ggpubr)
+setwd("E:/school/data mining/project/mimic-iii-clinical-database-1.4/mimic-iii-clinical-database-1.4/codes")
+
+prPlot<-read.csv("logpr.csv", sep=",", h=T)
+aucPlot<-read.csv("auc.csv", sep=",", h=T)
+
+auc<-bind_rows(aucPlot) %>% 
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
+
+
+pr<-bind_rows(prPlot) %>% 
+  ggplot(aes(x = recall, y = precision)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
+
+ggarrange(pr, auc + rremove("x.text"), 
+          labels = c("precision-recall", "AUC"),
+          ncol = 2, nrow = 2)
+
+```
+
+
 # Model explanation
 
 Process discovery was done by the implementation of the  heuristics miner algorithm. 
 
+\begin{minipage}[t]{0.5\textwidth}
+![Patients who survived](Dead.png)
+
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+![Patients who survived](Alive.png)
+\end{minipage}
 
 
 
-```{r, echo=FALSE, out.width=260, out.height=400,fig.align="center"}
-# #knitr::include_graphics("Hnet.com-image.PNG")
-# knitr::include_graphics("Alive.PNG")
-# 
-# #knitr::include_graphics("Hnet.com-image.PNG")
-# knitr::include_graphics("Dead.PNG")
 
-
+```{r, echo=FALSE,warning=FALSE,comment=NA}
+q2.m = matrix(c(5330,873,3446,312), nrow=2, byrow=T, 
+              dimnames = list(c("Alive", "Dead"),c("Asprin", "No")))
+#5330,873,3446,312
+q2.m
+epiR::epi.2by2(q2.m)
 ```
+
+
 
 
 
